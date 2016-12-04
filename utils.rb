@@ -9,7 +9,13 @@ def gen_id
 end
 
 
-def box(params={width: 10, height: 10, x: 10, y: 10})
+def box(params={width: 20, height: 10, x: 10, y: 10})
+  if params[:x] == "center"
+    params[:x] = (@map.width / 2) - (params[:width] / 2)
+  end
+  if params[:y] == "center"
+    params[:y] = (@map.height / 2) - (params[:height] / 2)
+  end
   (0..params[:width]).each do |n| # horizontal blocks
     @map.place_object(params[:x] + n, params[:y], 'wall')
     @map.place_object(params[:x] + n, params[:y] + params[:height], 'wall')
@@ -17,6 +23,33 @@ def box(params={width: 10, height: 10, x: 10, y: 10})
   (0..params[:height]).each do |n| # vertical blocks
     @map.place_object(params[:x] + params[:width], params[:y] + n, 'wall')
     @map.place_object(params[:x], params[:y] + n, 'wall')
+  end
+end
+
+def level_box(params={width: 20, height: 10, x: 10, y: 10})
+  if params[:x] == "center"
+    params[:x] = (@map.width / 2) - (params[:width] / 2)
+  end
+  if params[:y] == "center"
+    params[:y] = (@map.height / 2) - (params[:height] / 2)
+  end
+  (0..params[:width]).each do |n| # horizontal blocks
+    if n == (params[:width] / 2).round
+      @map.place_object(params[:x] + n, params[:y], "exit", id: "up")
+      @map.place_object(params[:x] + n, params[:y] + params[:height], "exit", id: "down")
+    else
+      @map.place_object(params[:x] + n, params[:y], 'wall')
+      @map.place_object(params[:x] + n, params[:y] + params[:height], 'wall')
+    end
+  end
+  (0..params[:height]).each do |n| # vertical blocks
+    if n == (params[:height] / 2).round
+      @map.place_object(params[:x], params[:y] + n, "exit", id: "left")
+      @map.place_object(params[:x] + params[:width], params[:y] + n, "exit",id: "right")
+    else
+      @map.place_object(params[:x], params[:y] + n, "wall")
+      @map.place_object(params[:x] + params[:width], params[:y] + n, "wall")
+    end
   end
 end
 
@@ -51,9 +84,9 @@ def default_definitions()
     symbol: ">",
     type: "dynamic",
     color: Gosu::Color::rgb(0, 232, 255),
-    behavior: -> {
-      if @map.colliding?(@map.player, @map.get_object_by_name("exit"))
-        @window.next_level
+    behavior: ->(args) {
+      if @map.colliding?(@map.player, @map.get_object_by_id(args[:id]))
+        @map.new_level(args[:id])
       end
     }
   })

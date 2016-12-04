@@ -1,5 +1,5 @@
 class Map
-  attr_reader :width, :height, :grid
+  attr_reader :width, :height, :grid, :level, :player_x, :player_y
   def initialize(x, y)
     @width = x
     @height = y
@@ -12,22 +12,62 @@ class Map
       color: Gosu::Color::rgb(28, 185, 25),
       inventory: [],
     })
+
+    @player_x = 0
+    @player_y = 0
+    #default_definitions()
+
+    @grid["#{@player_x} #{@player_y}"] = RandomRoom.new(self, "new")
+    level.place_stuff
   end
 
-  def reset
-    @grid = {}
+  def level
+    return @grid["#{@player_x} #{@player_y}"]
+  end
+
+  def new_level(id)
+    direction = id
+    case id
+    when "up"
+      @player_y -= 1
+    when "down"
+      @player_y += 1
+    when "left"
+      @player_x -= 1
+    when "right"
+      @player_x += 1
+    end
+    if !@grid.key?("#{@player_x} #{@player_y}")
+      @grid["#{@player_x} #{@player_y}"] = RandomRoom.new(self, direction)
+      level.place_stuff
+    end
+    level.enter_room(id, true)
   end
 
   def place_player(x, y)
-    @grid["#{x} #{y}"] = place_object(x, y, "player", {inventory: player[:inventory]})
+    level.grid["#{x} #{y}"] = place_object(x, y, "player", {inventory: player[:inventory]})
   end
 
   def update
-    @grid.each do |loc, object|
+    level.grid.each do |loc, object|
       if object[:type] == "item"
         if "#{player[:x]} #{player[:y]}" == "#{object[:x]} #{object[:y]}"
-          @grid.delete(loc)
+          level.grid.delete(loc)
           player[:inventory].push(object)
+        end
+      end
+    end
+  end
+
+  def turns
+    if level.update
+      level.grid.each do |loc, object|
+        if object.key?(:behavior)
+          if object[:args] != {}
+            object[:behavior].call(object.merge(object[:args]))
+          else
+            object[:behavior].call
+          end
         end
       end
     end
@@ -54,9 +94,9 @@ class Map
 
   def place_object(x, y, name, args={})
     raise "\nthere is no object called '#{name}'" if !@object_definitions.key?(name)
-    @grid["#{x} #{y}"] = @object_definitions[name].merge({name: name, x: x, y: y, args: args})
-    if @grid["#{x} #{y}"].key?(:initialize)
-      @grid["#{x} #{y}"][:initialize].call(args)
+    level.grid["#{x} #{y}"] = @object_definitions[name].merge({name: name, x: x, y: y, args: args})
+    if level.grid["#{x} #{y}"].key?(:initialize)
+      level.grid["#{x} #{y}"][:initialize].call(args)
     end
   end
 
@@ -64,7 +104,7 @@ class Map
     if !opts.is_a?(Hash)
       opts = {}
     end
-    @grid["#{x} #{y}"] = {
+    level.grid["#{x} #{y}"] = {
       symbol: char,
       x: x,
       y: y,
@@ -74,17 +114,17 @@ class Map
   end
 
   def player
-    @grid.each do |loc, props|
-      if props[:name] == "player"
-        return props
+    level.grid.each do |loc, object|
+      if object[:name] == "player"
+        return object
       end
     end
     raise "Must define player first!"
   end
 
   def get_object(x, y)
-    if @grid.key?("#{x} #{y}")
-      return @grid["#{x} #{y}"]
+    if level.grid.key?("#{x} #{y}")
+      return level.grid["#{x} #{y}"]
     else
       @space[:x] = x
       @space[:y] = y
@@ -93,10 +133,32 @@ class Map
   end
 
   def get_object_by_id(id)
-    @grid.each do |loc, props|
+    level.grid.each do |loc, object|
       begin
-        if props[:args][:id] == id
-          return @grid[loc]
+        if object[:args][:id] == id
+          return level.grid[loc]
+        end
+      rescue
+        next
+      end
+    end
+  end
+
+  def get_object_locs_by_name(name)
+    arr = []
+    level.grid.each do |loc, object|
+      if object[:name] == name
+        arr.push(loc)
+      end
+    end
+    return arr
+  end
+
+  def get_object_loc_by_id(id)
+    level.grid.each do |loc, object|
+      begin
+        if object[:args][:id] == id
+          return loc
         end
       rescue
         next
@@ -106,18 +168,18 @@ class Map
 
   def get_objects_by_name(name)
     arr = []
-    @grid.each do |loc, props|
-      if props[:name] == name
-        arr.push(@grid[loc])
+    level.grid.each do |loc, object|
+      if object[:name] == name
+        arr.push(level.grid[loc])
       end
     end
     return arr
   end
 
   def get_object_by_name(name)
-    @grid.each do |loc, props|
-      if props[:name] == name
-        return (@grid[loc])
+    level.grid.each do |loc, object|
+      if object[:name] == name
+        return (level.grid[loc])
       end
     end
   end
@@ -138,8 +200,8 @@ class Map
     if (object[:x] + n[0] < 0) or (object[:x] + n[0] > @width - 1) or (object[:y] + n[1] < 0) or (object[:y] + n[1] > @height - 1)
       return false
     end
-    @grid.each do |loc, props|
-      if "#{props[:x]} #{props[:y]}" == "#{object[:x] + n[0]} #{object[:y] + n[1]}" and props[:type] == "block"
+    level.grid.each do |loc, properties|
+      if "#{properties[:x]} #{properties[:y]}" == "#{object[:x] + n[0]} #{object[:y] + n[1]}" and properties[:type] == "block"
         return false
       end
     end
@@ -208,4 +270,15 @@ class Map
     end
   end
 
+  def turns
+    level.grid.each do |loc, object|
+      if object.key?(:behavior)
+        if object[:args] != {}
+          object[:behavior].call(object.merge(object[:args]))
+        else
+          object[:behavior].call
+        end
+      end
+    end
+  end
 end
