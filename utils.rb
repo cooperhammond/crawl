@@ -156,7 +156,7 @@ def chase(obj1, obj2)
 end
 
 def killed_by(words)
-  @window.set_pending("pend_killed_by", [@window, words])
+  $window.set_pending("pend_killed_by", [$window, words])
 end
 
 def pend_killed_by(args)
@@ -197,10 +197,10 @@ def talk(words, id, opts={})
   opts = {} if opts == nil
   # make an elseif statement so that it doesnt place this a lot and can be dismissed by pressing `A`
   if @map.are_touching?(@map.get_object_by_id(id), @map.player)
-    if @window.get_text_by_id(id) == false
-      @window.new_text(words, {sound: "text.wav", id: id}.merge(opts))
+    if $window.get_text_by_id(id) == false
+      $window.new_text(words, {sound: "text.wav", id: id}.merge(opts))
     end
-  elsif @window.get_text_by_id(id)
-    @window.texts.delete_at(@window.texts.index(@window.get_text_by_id(id)))
+  elsif $window.get_text_by_id(id)
+    $window.texts.delete_at(@window.texts.index(@window.get_text_by_id(id)))
   end
 end

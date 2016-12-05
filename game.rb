@@ -16,7 +16,7 @@ class GameWindow < Gosu::Window
     self.caption = ""
     @pending = []
     @timer = Time.new
-
+	$window = self
 
   end
 
@@ -31,11 +31,14 @@ class GameWindow < Gosu::Window
     end
 
     # Level updating and turns as well as any pending actions.
-
-    if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
-      @timer = Time.new
-      @map.turns
-    end
+	begin
+		if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
+		  @timer = Time.new
+		  @map.turns
+		end
+	rescue Exception => e
+		puts e
+	end
     if @pending.any?
       send(@pending[0], @pending[1])
       @pending = []

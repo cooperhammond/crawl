@@ -1,3 +1,5 @@
+require_relative 'game.rb'
+
 class RandomRoom
   attr_accessor :grid
   def initialize(map, direction)
@@ -26,7 +28,9 @@ class RandomRoom
   def place_stuff
     level_box(width: @width, height: @height, x: "center", y: "center")
     @map.place_object(@start_x, @start_y, "player")
-    #@map.place_object(rand(20..30), rand(20..30), "vampire", id: gen_id)
+	(rand(0..5)).times do
+		@map.place_object(rand(10..40), rand(10..40), "vampire", id: gen_id, words: "A vampire killed you.")
+	end
   end
 
   def update
