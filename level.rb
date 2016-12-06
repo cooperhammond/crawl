@@ -1,4 +1,5 @@
 require_relative 'game.rb'
+require_relative 'random/dungeon.rb'
 
 class RandomRoom
   attr_accessor :grid
@@ -26,11 +27,9 @@ class RandomRoom
   end
 
   def place_stuff
-    level_box(width: @width, height: @height, x: "center", y: "center")
-    @map.place_object(@start_x, @start_y, "player")
-	(rand(0..5)).times do
-		@map.place_object(rand(10..40), rand(10..40), "vampire", id: gen_id, words: "A vampire killed you.")
-	end
+    @map.create_from_grid(-1, -1, arena.to_s, {
+      "#" => "wall"
+    }
   end
 
   def update
