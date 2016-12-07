@@ -1,5 +1,5 @@
 require_relative 'game.rb'
-require_relative 'random/dungeon.rb'
+Dir["./random/*.rb"].each {|file| require file }
 
 class RandomRoom
   attr_accessor :grid
@@ -27,9 +27,12 @@ class RandomRoom
   end
 
   def place_stuff
-    @map.create_from_grid(-1, -1, arena.to_s, {
-      "#" => "wall"
-    }
+    puts $arena.to_s
+    @map.create_from_grid(-1, -1, $arena.to_s, {
+      "#" => ["wall", {color: Gosu::Color::rgb(255, 255, 255)}],
+      ">" => ["player"]
+    })
+    #@map.place_object(0, 0, "player")
   end
 
   def update

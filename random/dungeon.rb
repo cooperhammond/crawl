@@ -47,10 +47,10 @@ def create_room(arena, walker)
 end
 
 # Create an arena, and set of a walker in it.
-arena = Arena.new
-create_dungeon(arena, 400)
+$arena = Arena.new
+create_dungeon($arena, 400)
 
 # Put in the up stairs.
-arena[0,0] = '<'
+$arena[0,0] = '<'
 
 # Show the dungeon.

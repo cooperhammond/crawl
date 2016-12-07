@@ -24,7 +24,7 @@ class Map
   def level
     return @grid["#{@player_x} #{@player_y}"]
   end
-  
+
   def reset
 	level.grid = {}
   end

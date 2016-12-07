@@ -27,7 +27,9 @@ class GameWindow < Gosu::Window
       exit
     end
     if Gosu::button_down?(Gosu::KbZ)
-      puts "(#{@map.player_x}, #{@map.player_y})"
+      @map.level.grid.each do |loc, object|
+        puts object
+      end
     end
 
     # Level updating and turns as well as any pending actions.
