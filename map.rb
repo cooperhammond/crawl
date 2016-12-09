@@ -8,6 +8,7 @@ class Map
     @space = {symbol: ' ', type: 'block'}
     define_object("player", {
       symbol: "@",
+	  lvl: 1,
       type: 'dynamic',
       color: Gosu::Color::rgb(28, 185, 25),
       inventory: [],
