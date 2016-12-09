@@ -16,7 +16,7 @@ class GameWindow < Gosu::Window
     self.caption = ""
     @pending = []
     @timer = Time.new
-	$window = self
+	  $window = self
 
   end
 
@@ -83,5 +83,8 @@ class GameWindow < Gosu::Window
   end
 end
 
-$window = GameWindow.new(Map.new(75, 37))
+$x = 75
+$y = 37
+
+$window = GameWindow.new(Map.new($x, $y))
 $window.show()
