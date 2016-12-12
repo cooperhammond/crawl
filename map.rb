@@ -78,6 +78,10 @@ class Map
     end
   end
 
+  def delete_object(id)
+    level.grid.delete(level.grid.key(get_object_by_id(id)))
+  end
+
   def define_object(name, properties={})
     # properties must resemble something like:
     # define_object("<new-name>", {

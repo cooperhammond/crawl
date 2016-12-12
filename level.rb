@@ -19,9 +19,23 @@ class RandomRoom
       type: "dynamic",
       color: Gosu::Color::rgb(255, 0, 0),
       behavior: ->(args) {
-        chase(@map.get_object_by_id(args[:id]), @map.player)
-        kill_player_if_touching(args[:id], args[:words] || "You were killed by a vampire.")
+        #chase(@map.get_object_by_id(args[:id]), @map.player)
+        me = @map.get_object_by_id(args[:id])
+        move_x = rand(-1..1)
+        me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
+        move_y = rand(-1..1)
+        me[:y] += move_y if @map.valid_movement?([0, move_y], me)
+        if @map.has_item?("sword") and @map.are_touching?(me, @map.player)
+          @map.delete_object(args[:id])
+        else
+          kill_player_if_touching(args[:id], args[:words] || "You were killed by a vampire.")
+        end
       }
+    })
+    @map.define_object("sword", {
+      symbol: "W",
+      type: "item",
+      color: Gosu::Color::rgb(55, 55, 155)
     })
 
     options = {
@@ -63,7 +77,10 @@ class RandomRoom
       ">" => ["player"],
     })
     randomly_place_object("player")
-    randomly_place_object("vampire", id: gen_id)
+    5.times do
+      randomly_place_object("vampire", id: gen_id)
+    end
+    randomly_place_object("sword")
   end
 
   def update

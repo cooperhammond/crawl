@@ -34,6 +34,7 @@ class GameWindow < Gosu::Window
 
     # Level updating and turns as well as any pending actions.
 	begin
+    @map.update
 		if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
 		  @timer = Time.new
 		  @map.turns
@@ -53,11 +54,11 @@ class GameWindow < Gosu::Window
       1, 1, props[:color])
     end
     @font.draw("Items: ", 0, (@map.height * @text_height).round, 1, 1, 1, Gosu::Color::rgb(150, 150, 150))
-    #@map.player[:inventory].each do |item|
-    #  @font.draw(item[:symbol], (@map.player[:inventory].index(item) *
-    #  (@text_width * 2)) + @text_width * 7, (@map.height * @text_height).round,
-    #  1, 1, 1, item[:color])
-    #end
+    @map.player[:inventory].each do |item|
+      @font.draw(item[:symbol], (@map.player[:inventory].index(item) *
+      (@text_width * 2)) + @text_width * 7, (@map.height * @text_height).round,
+      1, 1, 1, item[:color])
+    end
     @texts.uniq
     @texts.each do |text|
       text.draw
