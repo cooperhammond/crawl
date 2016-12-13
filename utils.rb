@@ -80,13 +80,22 @@ def default_definitions()
     symbol: "#",
     type: 'block'
   })
-  @map.define_object("exit", {
+  @map.define_object("stairs", {
     symbol: ">",
     type: "dynamic",
     color: Gosu::Color::rgb(0, 232, 255),
-    behavior: ->(args) {
+    key: ->(args) { # Make a seperate method caller for key
       if @map.colliding?(@map.player, @map.get_object_by_id(args[:id]))
-        @map.new_level(args[:id])
+        case args[:num]
+        when 1
+          if Gosu::button_down?(Gosu::KbComma)
+            @map.new_level(1)
+          end
+        when -1
+          if Gosu::button_down?(Gosu::KbPeriod)
+            @map.new_level(-1)
+          end
+        end
       end
     }
   })

@@ -3,7 +3,8 @@ require 'meiro'
 
 class RandomRoom
   attr_accessor :grid
-  def initialize(map, direction)
+  def initialize(map, status)
+    @status = status
     @map = map
     @move_timer = Time.new
     @timer = Time.new
@@ -14,21 +15,26 @@ class RandomRoom
     @width = rand(40..60)
     @height = rand(20..30)
 
-    @map.define_object("vampire", {
-      symbol: "V",
+    @map.define_object("alien", {
+      symbol: "A",
       type: "dynamic",
-      color: Gosu::Color::rgb(255, 0, 0),
+      hp: 100,
+      color: Gosu::Color::rgb(100, 255, 100),
       behavior: ->(args) {
         #chase(@map.get_object_by_id(args[:id]), @map.player)
         me = @map.get_object_by_id(args[:id])
-        move_x = rand(-1..1)
-        me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
-        move_y = rand(-1..1)
-        me[:y] += move_y if @map.valid_movement?([0, move_y], me)
+        case rand(0..1)
+        when 1
+          move_x = rand(-1..1)
+          me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
+        when 0
+          move_y = rand(-1..1)
+          me[:y] += move_y if @map.valid_movement?([0, move_y], me)
+        end
         if @map.has_item?("sword") and @map.are_touching?(me, @map.player)
           @map.delete_object(args[:id])
         else
-          kill_player_if_touching(args[:id], args[:words] || "You were killed by a vampire.")
+          kill_player_if_touching(args[:id], args[:words] || "You were killed by an alien.")
         end
       }
     })
@@ -76,11 +82,19 @@ class RandomRoom
       "#" => ["wall", {color: Gosu::Color::rgb(255, 255, 255)}],
       ">" => ["player"],
     })
-    randomly_place_object("player")
     5.times do
-      randomly_place_object("vampire", id: gen_id)
+      randomly_place_object("alien", id: gen_id)
     end
     randomly_place_object("sword")
+    randomly_place_object("stairs", id: "descend", num: -1)
+    if @status != "new"
+      randomly_place_object("ascend", id: "ascend", num: 1)
+      randomly_place_object("player")
+      @map.player[:x] = (@map.get_object_by_id("ascend")[:x])
+      @map.player[:y] = (@map.get_object_by_id("ascend")[:y])
+    else
+      randomly_place_object("player")
+    end
   end
 
   def update
