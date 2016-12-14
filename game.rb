@@ -27,13 +27,12 @@ class GameWindow < Gosu::Window
       exit
     end
     if Gosu::button_down?(Gosu::KbZ)
-      @map.level.grid.each do |loc, object|
-        puts object
-      end
+      puts "#{@map.player_offsetx}, #{@map.player_offsety}"
     end
 
     # Level updating and turns as well as any pending actions.
 	begin
+    @map.update
 		if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
 		  @timer = Time.new
 		  @map.turns
@@ -49,10 +48,10 @@ class GameWindow < Gosu::Window
 
   def draw
     @map.level.grid.each do |point, props|
-      @font.draw(props[:symbol], props[:x] * @text_width, props[:y] * @text_height, 1,
+      @font.draw(props[:symbol], props[:x] * @text_width + @map.player_offsetx, props[:y] * @text_height + @map.player_offsety, 1,
       1, 1, props[:color])
     end
-    @font.draw("Items: ", 0, (@map.height * @text_height).round, 1, 1, 1, Gosu::Color::rgb(150, 150, 150))
+    #@font.draw("Items: ", 0, (@map.height * @text_height).round, 1, 1, 1, Gosu::Color::rgb(150, 150, 150))
     #@map.player[:inventory].each do |item|
     #  @font.draw(item[:symbol], (@map.player[:inventory].index(item) *
     #  (@text_width * 2)) + @text_width * 7, (@map.height * @text_height).round,

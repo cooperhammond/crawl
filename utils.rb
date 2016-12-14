@@ -138,21 +138,33 @@ def chase_psychopathically(obj1, obj2)
 end
 
 def chase(obj1, obj2)
-  left_dist = obj1[:x] - obj2[:x]
-  up_dist = obj1[:y] - obj2[:y]
+  def get_optimal_dirs(fails=[])
+    if (@up_dist > 0 and @up_dist >= @left_dist) and !fails.include?([0, -1])
+      dir = [0, -1]
+    elsif (@up_dist < 0 and @up_dist < @left_dist) and !fails.include?([0, 1])
+      dir = [0, 1]
+    elsif (@left_dist > 0 and @left_dist >= @up_dist) and !fails.include?([-1, 0])
+      dir = [-1, 0]
+    elsif !fails.include?([1, 0])
+      dir = [1, 0]
+    end
+    return dir
+  end
+  @left_dist = obj1[:x] - obj2[:x]
+  @up_dist = obj1[:y] - obj2[:y]
 
-  if (up_dist == 0 and left_dist == 0)
+  if (@up_dist == 0 and @left_dist == 0)
     return
   end
-  if (up_dist > 0 and up_dist >= left_dist) and @map.valid_movement?([0, -1], obj1)
-    obj1[:y] += -1
-  elsif (up_dist < 0 and up_dist < left_dist) and @map.valid_movement?([0, 1], obj1)
-    obj1[:y] += 1
-  elsif (left_dist > 0 and left_dist >= up_dist) and @map.valid_movement?([-1, 0], obj1)
-    obj1[:x] += -1
-  elsif @map.valid_movement?([1, 0], obj1)
-    obj1[:x] += 1
+
+  dir = get_optimal_dirs()
+  fails = []
+  while !@map.valid_movement?(dir, obj1)
+    fails.push(dir)
+    dir = get_optimal_dirs(fails)
   end
+  obj1[:x] += dir[0]
+  obj1[:y] += dir[1]
 end
 
 def killed_by(words)

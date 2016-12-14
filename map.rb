@@ -1,5 +1,6 @@
 class Map
-  attr_reader :width, :height, :grid, :level, :player_x, :player_y
+  attr_reader :width, :height, :grid, :level
+  attr_reader :player_offsetx, :player_offsety
   def initialize(x, y)
     @width = x
     @height = y
@@ -8,7 +9,7 @@ class Map
     @space = {symbol: ' ', type: 'block'}
     define_object("player", {
       symbol: "@",
-	  lvl: 1,
+	    lvl: 1,
       type: 'dynamic',
       color: Gosu::Color::rgb(28, 185, 25),
       inventory: [],
@@ -17,6 +18,8 @@ class Map
     @player_x = 0
     @player_y = 0
     #default_definitions()
+    @player_offsetx = 0
+    @player_offsety = 0
 
     @grid["#{@player_x} #{@player_y}"] = RandomRoom.new(self, "new")
     level.place_stuff
