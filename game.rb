@@ -1,5 +1,5 @@
 require 'gosu'
-Dir["./*.rb"].each {|file| require file }
+Dir["./*.rb"].each { |file| require file }
 
 class GameWindow < Gosu::Window
   attr_accessor :texts
@@ -8,7 +8,7 @@ class GameWindow < Gosu::Window
     temp = Gosu::Window.new(1, 1)
     @scale = 25
     @text_height = @scale
-    @zoom = 1.5
+    @zoom = 1.6
     @font = Gosu::Font.new(temp, "./courier.ttf", @text_height)
     @texts = []
     @text_width = @font.text_width("!")
@@ -19,6 +19,7 @@ class GameWindow < Gosu::Window
     @timer = Time.new
 	  $window = self
     @map.give_window(self)
+    @map.start_running
 
   end
 

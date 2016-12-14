@@ -157,6 +157,10 @@ def chase_psychopathically(obj1, obj2)
   end
 end
 
+def chase_if_seen(obj1, obj2)
+  
+end
+
 def chase(obj1, obj2)
   def get_optimal_dirs(fails=[])
     if (@up_dist > 0 and @up_dist >= @left_dist) and !fails.include?([0, -1])

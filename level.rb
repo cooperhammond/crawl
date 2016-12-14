@@ -79,9 +79,9 @@ class RandomRoom
       ">" => ["player"],
     })
 
-    #5.times do
-    #  randomly_place_object("alien", id: gen_id)
-    #end
+    15.times do
+      randomly_place_object("alien", id: gen_id)
+    end
 
     randomly_place_object("stairs", id: "descend", num: -1)
     if @status == "next"
@@ -107,8 +107,8 @@ class RandomRoom
 
   def offset_map_by_name(name)
     offset_to = @map.get_object_by_name(name)
-    @map.player_offset_x = -(offset_to[:x] - @map.width / 3)
-    @map.player_offset_y = -(offset_to[:y] - @map.height / 3)
+    @map.player_offset_x = -(offset_to[:x] - @map.width / (@window.zoom / 0.5))
+    @map.player_offset_y = -(offset_to[:y] - @map.height / (@window.zoom / 0.5))
   end
 
   def randomly_place_object(object, args={})

@@ -20,6 +20,10 @@ class Map
     @player_offset_x = 0
     @player_offset_y = 0
 
+
+  end
+
+  def start_running
     @grid[@player_floor] = RandomRoom.new(self, "new", @window)
     level.place_stuff
   end
