@@ -3,9 +3,10 @@ require 'meiro'
 
 class RandomRoom
   attr_accessor :grid
-  def initialize(map, status)
+  def initialize(map, status, window)
     @status = status
     @map = map
+    @window = window
     @move_timer = Time.new
     @timer = Time.new
     @freeze = false
@@ -32,21 +33,16 @@ class RandomRoom
           me[:y] += move_y if @map.valid_movement?([0, move_y], me)
         end
         if @map.has_item?("sword") and @map.are_touching?(me, @map.player)
-          @map.delete_object(args[:id])
+          @map.delete_object_by_id(args[:id])
         else
           kill_player_if_touching(args[:id], args[:words] || "You were killed by an alien.")
         end
       }
     })
-    @map.define_object("sword", {
-      symbol: "W",
-      type: "item",
-      color: Gosu::Color::rgb(55, 55, 155)
-    })
 
     options = {
-      width:  75,
-      height: 37,
+      width:  @map.width,
+      height: @map.height,
       min_room_number: 3,
       max_room_number: 10,
       min_room_width:  5,
@@ -82,23 +78,37 @@ class RandomRoom
       "#" => ["wall", {color: Gosu::Color::rgb(255, 255, 255)}],
       ">" => ["player"],
     })
+
     5.times do
       randomly_place_object("alien", id: gen_id)
     end
-    randomly_place_object("sword")
+
     randomly_place_object("stairs", id: "descend", num: -1)
-    if @status != "new"
-      randomly_place_object("ascend", id: "ascend", num: 1)
+    if @status == "next"
+      randomly_place_object("stairs", id: "ascend", num: 1)
       randomly_place_object("player")
       @map.player[:x] = (@map.get_object_by_id("ascend")[:x])
       @map.player[:y] = (@map.get_object_by_id("ascend")[:y])
+      offset_map_by_name("player")
+
     else
       randomly_place_object("player")
+      while !@map.level.grid.key?("#{@map.player[:x]} #{@map.player[:y]}")
+        @map.delete_object_by_name("player")
+        randomly_place_object("player")
+      end
+      offset_map_by_name("player")
     end
   end
 
   def update
     object_controls(@map.player)
+  end
+
+  def offset_map_by_name(name)
+    offset_to = @map.get_object_by_name(name)
+    @map.player_offset_x -= offset_to[:x] / 4
+    @map.player_offset_y -= offset_to[:y] / 4
   end
 
   def randomly_place_object(object, args={})

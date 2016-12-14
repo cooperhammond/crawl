@@ -1,5 +1,5 @@
 class Map
-  attr_reader :width, :height, :grid, :level, :player_x, :player_y
+  attr_reader :width, :height, :grid, :level, :player_x, :player_y, :player_floor
   attr_accessor :player_offset_x, :player_offset_y
   def initialize(x, y)
     @width = x
@@ -16,12 +16,16 @@ class Map
     })
 
     @player_floor = 0
-    #default_definitions()
-    @player_offsetx = 0
-    @player_offsety = 0
 
-    @grid[@player_floor] = RandomRoom.new(self, "new")
+    @player_offset_x = 0
+    @player_offset_y = 0
+
+    @grid[@player_floor] = RandomRoom.new(self, "new", @window)
     level.place_stuff
+  end
+
+  def give_window(window)
+    @window = window
   end
 
   def level
@@ -34,17 +38,11 @@ class Map
 
   def new_level(id)
     direction = id
-    case id
-    when "up"
-      @player_floor += 1
-    when "down"
-      @player_floor -= 1
-    end
+    @player_floor += id
     if !@grid.key?(@player_floor)
-      @grid[@player_floor] = RandomRoom.new(self, "next")
+      @grid[@player_floor] = RandomRoom.new(self, "next", @window)
       level.place_stuff
     end
-    level.enter_room(id, true)
   end
 
   def place_player(x, y)
@@ -60,6 +58,8 @@ class Map
         end
       end
     end
+    player[:x] = 37
+    player[:y] = (37 / 2).round
   end
 
   def turns
@@ -76,8 +76,16 @@ class Map
     end
   end
 
-  def delete_object(id)
+  def delete_object_by_id(id)
     level.grid.delete(level.grid.key(get_object_by_id(id)))
+  end
+
+  def delete_object_by_name(name)
+    level.grid.each do |loc, object|
+      if object[:name] == name
+        level.grid.delete(loc)
+      end
+    end
   end
 
   def define_object(name, properties={})

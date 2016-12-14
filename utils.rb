@@ -54,22 +54,28 @@ def level_box(params={width: 20, height: 10, x: 10, y: 10})
 end
 
 def object_controls(object)
+  def everything(xy, change)
+    @map.level.grid.each do |loc, object|
+      object[xy] += change unless object[:symbol] == "@"
+    end
+  end
+
   if Time.new - @move_timer > 0.06
     @move_timer = Time.new
     if Gosu::button_down?(Gosu::KbUp)
-      object[:y] -= 1 if @map.valid_movement?([0,-1], object)
+      everything(:y, 1) if @map.valid_movement?([0,-1], object)
       return true
     end
     if Gosu::button_down?(Gosu::KbDown)
-      object[:y] += 1 if @map.valid_movement?([0,1], object)
+      everything(:y, -1) if @map.valid_movement?([0,1], object)
       return true
     end
     if Gosu::button_down?(Gosu::KbLeft)
-      object[:x] -= 1 if @map.valid_movement?([-1,0], object)
+      everything(:x, 1) if @map.valid_movement?([-1,0], object)
       return true
     end
     if Gosu::button_down?(Gosu::KbRight)
-      object[:x] += 1 if @map.valid_movement?([1,0], object)
+      everything(:x, -1) if @map.valid_movement?([1,0], object)
       return true
     end
   end
@@ -80,15 +86,29 @@ def default_definitions()
     symbol: "#",
     type: 'block'
   })
-  @map.define_object("exit", {
+  @map.define_object("stairs", {
     symbol: ">",
     type: "dynamic",
     color: Gosu::Color::rgb(0, 232, 255),
-    behavior: ->(args) {
-      if @map.colliding?(@map.player, @map.get_object_by_id(args[:id]))
-        @map.new_level(args[:id])
+    initialize: ->(args) {
+      if args[:num] == -1
+        @map.get_object_by_id(args[:id])[:symbol] = ">"
+      else
+        @map.get_object_by_id(args[:id])[:symbol] = "<"
       end
-    }
+    },
+    keys: ->(args) {
+      if args[:num] == -1
+        key = Gosu::KbPeriod
+      else
+        key = Gosu::KbComma
+      end
+      if @map.colliding?(@map.player, @map.get_object_by_id(args[:id]))
+        if Gosu::button_down?(key)
+          @map.new_level(args[:num])
+        end
+      end
+    },
   })
   @map.define_object("teleporter", {
     # requires a `target_x` and `target_y` as arguments

@@ -3,11 +3,12 @@ Dir["./*.rb"].each {|file| require file }
 
 class GameWindow < Gosu::Window
   attr_accessor :texts
-  attr_reader :map, :level
+  attr_reader :map, :level, :zoom
   def initialize(map)
     temp = Gosu::Window.new(1, 1)
     @scale = 25
     @text_height = @scale
+    @zoom = 1.5
     @font = Gosu::Font.new(temp, "./courier.ttf", @text_height)
     @texts = []
     @text_width = @font.text_width("!")
@@ -17,6 +18,7 @@ class GameWindow < Gosu::Window
     @pending = []
     @timer = Time.new
 	  $window = self
+    @map.give_window(self)
 
   end
 
@@ -27,11 +29,23 @@ class GameWindow < Gosu::Window
       exit
     end
     if Gosu::button_down?(Gosu::KbZ)
-      puts "#{@map.player_offsetx}, #{@map.player_offsety}"
+      puts "#{@map.player_offset_x}, #{@map.player_offset_y}"
+    end
+    if Gosu::button_down?(Gosu::KbF)
+      puts Gosu::fps
     end
 
     # Level updating and turns as well as any pending actions.
 	begin
+    @map.level.grid.each do |loc, object|
+      if object.key?(:keys)
+        if object.key?(:args)
+          object[:keys].call(object[:args])
+        else
+          object[:keys].call
+        end
+      end
+    end
     @map.update
 		if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
 		  @timer = Time.new
@@ -48,24 +62,17 @@ class GameWindow < Gosu::Window
 
   def draw
     @map.level.grid.each do |point, props|
-      @font.draw(props[:symbol], props[:x] * @text_width + @map.player_offsetx, props[:y] * @text_height + @map.player_offsety, 1,
-      1, 1, props[:color])
+      @font.draw(props[:symbol], (props[:x] * @text_width + @map.player_offset_x * @text_width) * @zoom,
+        (props[:y] * @text_height + @map.player_offset_y * @text_height) * @zoom, 1, @zoom, @zoom, props[:color])
     end
-<<<<<<< HEAD
-    #@font.draw("Items: ", 0, (@map.height * @text_height).round, 1, 1, 1, Gosu::Color::rgb(150, 150, 150))
-    #@map.player[:inventory].each do |item|
-    #  @font.draw(item[:symbol], (@map.player[:inventory].index(item) *
-    #  (@text_width * 2)) + @text_width * 7, (@map.height * @text_height).round,
-    #  1, 1, 1, item[:color])
-    #end
-=======
-    @font.draw("Items: ", 0, (@map.height * @text_height).round, 1, 1, 1, Gosu::Color::rgb(150, 150, 150))
+
+    @font.draw("Items: ", 0, (@map.height * @text_height).round * @zoom, 2, @zoom, @zoom, Gosu::Color::rgb(150, 150, 150))
+
     @map.player[:inventory].each do |item|
-      @font.draw(item[:symbol], (@map.player[:inventory].index(item) *
-      (@text_width * 2)) + @text_width * 7, (@map.height * @text_height).round,
-      1, 1, 1, item[:color])
+      @font.draw(item[:symbol], ((@map.player[:inventory].index(item) *
+      (@text_width * 2)) + @text_width * 7) * @zoom, ((@map.height * @text_height).round) * @zoom,
+      1, @zoom, @zoom, item[:color])
     end
->>>>>>> 32ce4471835fce411ab03c442f39585e061892a3
     @texts.uniq
     @texts.each do |text|
       text.draw
