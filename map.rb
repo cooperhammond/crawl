@@ -58,8 +58,7 @@ class Map
         end
       end
     end
-    player[:x] = 37
-    player[:y] = (37 / 2).round
+    level.offset_map_by_name("player")
   end
 
   def turns
