@@ -1,6 +1,6 @@
 class Map
-  attr_reader :width, :height, :grid, :level
-  attr_reader :player_offsetx, :player_offsety
+  attr_reader :width, :height, :grid, :level, :player_x, :player_y
+  attr_accessor :player_offset_x, :player_offset_y
   def initialize(x, y)
     @width = x
     @height = y
@@ -15,18 +15,17 @@ class Map
       inventory: [],
     })
 
-    @player_x = 0
-    @player_y = 0
+    @player_floor = 0
     #default_definitions()
     @player_offsetx = 0
     @player_offsety = 0
 
-    @grid["#{@player_x} #{@player_y}"] = RandomRoom.new(self, "new")
+    @grid[@player_floor] = RandomRoom.new(self, "new")
     level.place_stuff
   end
 
   def level
-    return @grid["#{@player_x} #{@player_y}"]
+    return @grid[@player_floor]
   end
 
   def reset
@@ -37,16 +36,12 @@ class Map
     direction = id
     case id
     when "up"
-      @player_y -= 1
+      @player_floor += 1
     when "down"
-      @player_y += 1
-    when "left"
-      @player_x -= 1
-    when "right"
-      @player_x += 1
+      @player_floor -= 1
     end
-    if !@grid.key?("#{@player_x} #{@player_y}")
-      @grid["#{@player_x} #{@player_y}"] = RandomRoom.new(self, direction)
+    if !@grid.key?(@player_floor)
+      @grid[@player_floor] = RandomRoom.new(self, "next")
       level.place_stuff
     end
     level.enter_room(id, true)
@@ -79,6 +74,10 @@ class Map
         end
       end
     end
+  end
+
+  def delete_object(id)
+    level.grid.delete(level.grid.key(get_object_by_id(id)))
   end
 
   def define_object(name, properties={})

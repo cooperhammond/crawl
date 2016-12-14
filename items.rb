@@ -32,9 +32,12 @@ class Weapon
 		end
 	end
 end
+<<<<<<< HEAD
 5.times do
 item = Weapon.new
 item.initailize(rand(1..10), 0)
 puts item.name
 puts item.damage
 end
+=======
+>>>>>>> 32ce4471835fce411ab03c442f39585e061892a3

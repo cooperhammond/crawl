@@ -51,12 +51,21 @@ class GameWindow < Gosu::Window
       @font.draw(props[:symbol], props[:x] * @text_width + @map.player_offsetx, props[:y] * @text_height + @map.player_offsety, 1,
       1, 1, props[:color])
     end
+<<<<<<< HEAD
     #@font.draw("Items: ", 0, (@map.height * @text_height).round, 1, 1, 1, Gosu::Color::rgb(150, 150, 150))
     #@map.player[:inventory].each do |item|
     #  @font.draw(item[:symbol], (@map.player[:inventory].index(item) *
     #  (@text_width * 2)) + @text_width * 7, (@map.height * @text_height).round,
     #  1, 1, 1, item[:color])
     #end
+=======
+    @font.draw("Items: ", 0, (@map.height * @text_height).round, 1, 1, 1, Gosu::Color::rgb(150, 150, 150))
+    @map.player[:inventory].each do |item|
+      @font.draw(item[:symbol], (@map.player[:inventory].index(item) *
+      (@text_width * 2)) + @text_width * 7, (@map.height * @text_height).round,
+      1, 1, 1, item[:color])
+    end
+>>>>>>> 32ce4471835fce411ab03c442f39585e061892a3
     @texts.uniq
     @texts.each do |text|
       text.draw
