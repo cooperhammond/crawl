@@ -13,7 +13,8 @@ class GameWindow < Gosu::Window
     @texts = []
     @text_width = @font.text_width("!")
     @map = map
-    super((@map.width * @text_width).round, (@map.height * @text_height).round + @text_height)
+    @box_width = 20
+    super((@map.width * @text_width).round + (@text_width * @box_width).round, (@map.height * @text_height).round + @text_height)
     self.caption = ""
     @pending = []
     @timer = Time.new
@@ -62,6 +63,8 @@ class GameWindow < Gosu::Window
   end
 
   def draw
+    Gosu::draw_rect(self.width - (@text_width * @box_width), 0, self.width - (self.width / (@text_width * @box_width)), self.height, Gosu::Color::rgb(0, 0, 0), 2)
+
     @map.level.grid.each do |point, props|
       @font.draw(props[:symbol], (props[:x] * @text_width + @map.player_offset_x * @text_width) * @zoom,
         (props[:y] * @text_height + @map.player_offset_y * @text_height) * @zoom, 1, @zoom, @zoom, props[:color])
