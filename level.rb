@@ -22,8 +22,9 @@ class RandomRoom
       hp: 100,
       color: Gosu::Color::rgb(100, 255, 100),
       behavior: ->(args) {
-        #chase(@map.get_object_by_id(args[:id]), @map.player)
         me = @map.get_object_by_id(args[:id])
+        chase(me, @map.player)
+=begin
         case rand(0..1)
         when 1
           move_x = rand(-1..1)
@@ -37,6 +38,7 @@ class RandomRoom
         else
           kill_player_if_touching(args[:id], args[:words] || "You were killed by an alien.")
         end
+=end
       }
     })
 
@@ -79,7 +81,7 @@ class RandomRoom
       ">" => ["player"],
     })
 
-    15.times do
+    (0..5).each do |n|
       randomly_place_object("alien", id: gen_id)
     end
 
