@@ -158,7 +158,12 @@ def chase_psychopathically(obj1, obj2)
 end
 
 def chase_if_seen(obj1, obj2)
-  
+
+end
+
+def can_see(player, enemy)
+   #enemy[:y]
+
 end
 
 def chase(obj1, obj2)
