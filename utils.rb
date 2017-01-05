@@ -162,8 +162,8 @@ def chase_if_seen(obj1, obj2)
 end
 
 def can_see(player, enemy)
-   #enemy[:y]
-
+  slope = (enemy[:y].to_f - player[:y].to_f)/(enemy[:x].to_f - player[:x].to_f).round(2)
+  puts slope
 end
 
 def chase(obj1, obj2)

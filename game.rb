@@ -21,6 +21,9 @@ class GameWindow < Gosu::Window
 	  $window = self
     @map.give_window(self)
     @map.start_running
+	@map.get_objects_by_name("alien").each do |alien|
+		can_see(@map.player, alien)
+	end
 
   end
 
