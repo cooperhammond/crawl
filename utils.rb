@@ -158,9 +158,19 @@ def chase_psychopathically(obj1, obj2)
 end
 
 def can_see(player, enemy, wall_array)
-  slope = (enemy[:y].to_f - player[:y].to_f)/(enemy[:x].to_f - player[:x].to_f).round
+  slope = (enemy[:y].to_f - player[:y].to_f)/(enemy[:x].to_f - player[:x].to_f)
+  slope = slope.round(3)
   puts slope
-  distance = (((enemy[:x]-)^2)+(()^2))^(1/2)
+  if (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2)) < 0
+	distance = (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2)) * -1
+  else 
+	distance = (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2))
+  end
+  distance = Math.sqrt(distance)
+  distance = distance.round(3)
+  puts distance
+  distance.to_i.times do 
+  end
 end
 
 def chase(obj1, obj2)

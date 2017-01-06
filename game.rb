@@ -25,6 +25,7 @@ class GameWindow < Gosu::Window
 	@map.get_objects_by_name("alien").each do |alien|
 		can_see(@map.player, alien, wall_array)
 	end
+	@map.get_object_by_loc(0, 0)
 
   end
 

@@ -161,6 +161,15 @@ class Map
       end
     end
   end
+  
+  def get_object_by_loc(x, y)
+	level.grid.each do |loc, object|
+	  if "#{x} #{y}" == loc
+		return object
+	  end
+	end
+	
+  end
 
   def get_object_locs_by_name(name)
     arr = []
