@@ -157,13 +157,10 @@ def chase_psychopathically(obj1, obj2)
   end
 end
 
-def chase_if_seen(obj1, obj2)
-
-end
-
-def can_see(player, enemy)
-  slope = (enemy[:y].to_f - player[:y].to_f)/(enemy[:x].to_f - player[:x].to_f).round(2)
+def can_see(player, enemy, wall_array)
+  slope = (enemy[:y].to_f - player[:y].to_f)/(enemy[:x].to_f - player[:x].to_f).round
   puts slope
+  distance = (((enemy[:x]-)^2)+(()^2))^(1/2)
 end
 
 def chase(obj1, obj2)
