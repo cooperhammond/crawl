@@ -23,8 +23,8 @@ class RandomRoom
       color: Gosu::Color::rgb(100, 255, 100),
       behavior: ->(args) {
         me = @map.get_object_by_id(args[:id])
-        if distance_from(@map.player, me) < 10
-          chase(me, @map.player)
+        if distance_from(@map.player, me) < 7
+          chase_psychopathically(me, @map.player)
         else
           case rand(0..1)
           when 1
