@@ -23,9 +23,21 @@ class RandomRoom
       color: Gosu::Color::rgb(100, 255, 100),
       behavior: ->(args) {
         me = @map.get_object_by_id(args[:id])
-        chase(me, @map.player)
+        #chase(me, @map.player)
 =begin
-        case rand(0..1)
+        
+=end
+      }
+    })
+	
+	wall_array = @map.get_objects_by_name("wall")
+	alien_array = @map.get_objects_by_name("alien")
+	for alien in alien_array
+		cansee = can_see(@map.player, alien, wall_array)
+		if cansee
+			chase_psychopathically(@map.player, alien)
+		else 
+			case rand(0..1)
         when 1
           move_x = rand(-1..1)
           me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
@@ -38,10 +50,9 @@ class RandomRoom
         else
           kill_player_if_touching(args[:id], args[:words] || "You were killed by an alien.")
         end
-=end
-      }
-    })
-
+		end
+	end
+	
     options = {
       width:  @map.width,
       height: @map.height,

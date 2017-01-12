@@ -158,6 +158,7 @@ def chase_psychopathically(obj1, obj2)
 end
 
 def can_see(player, enemy, wall_array)
+  fail = false
   slope = (enemy[:y].to_f - player[:y].to_f)/(enemy[:x].to_f - player[:x].to_f)
   slope = slope.round(3)
   puts slope
@@ -169,7 +170,19 @@ def can_see(player, enemy, wall_array)
   distance = Math.sqrt(distance)
   distance = distance.round(3)
   puts distance
-  distance.to_i.times do 
+  (distance/slope).to_i.times do 
+	wall_array.each do |wall|
+	  checkslope = (enemy[:y].to_f - wall[:y].to_f)/(enemy[:x].to_f - wall[:x].to_f)
+	  checkslope = checkslope.round(3)
+	  if checkslope == slope
+		fail = true
+	  end
+	end
+  end
+  if fail == false
+	return true
+  else
+	return false
   end
 end
 
