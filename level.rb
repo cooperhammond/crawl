@@ -23,10 +23,18 @@ class RandomRoom
       color: Gosu::Color::rgb(100, 255, 100),
       behavior: ->(args) {
         me = @map.get_object_by_id(args[:id])
-        #chase(me, @map.player)
-=begin
-
-=end
+        if distance_from(@map.player, me) < 10
+          chase(me, @map.player)
+        else
+          case rand(0..1)
+          when 1
+            move_x = rand(-1..1)
+            me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
+          when 0
+            move_y = rand(-1..1)
+            me[:y] += move_y if @map.valid_movement?([0, move_y], me)
+          end
+        end
       }
     })
 
@@ -64,29 +72,6 @@ class RandomRoom
   end
 
   def place_stuff
-    wall_array = @map.get_objects_by_name("wall")
-  	alien_array = @map.get_objects_by_name("alien")
-  	for alien in alien_array
-  		cansee = can_see(@map.player, alien, wall_array)
-  		if cansee
-  			chase_psychopathically(@map.player, alien)
-  		else
-  			case rand(0..1)
-          when 1
-            move_x = rand(-1..1)
-            me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
-          when 0
-            move_y = rand(-1..1)
-            me[:y] += move_y if @map.valid_movement?([0, move_y], me)
-          end
-          if @map.has_item?("sword") and @map.are_touching?(me, @map.player)
-            @map.delete_object_by_id(args[:id])
-          else
-            kill_player_if_touching(args[:id], args[:words] || "You were killed by an alien.")
-          end
-  		end
-  	end
-
     @map.create_from_grid(-1, -1, @floor, {
       "#" => ["wall", {color: Gosu::Color::rgb(255, 255, 255)}],
       ">" => ["player"],
