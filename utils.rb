@@ -157,6 +157,37 @@ def chase_psychopathically(obj1, obj2)
   end
 end
 
+def test_sight(obj1, obj2)
+  mock_obj = obj1.clone
+
+  @left_dist = mock_obj[:x] - obj2[:x]
+  @up_dist = mock_obj[:y] - obj2[:y]
+
+  dir = get_optimal_dirs()
+
+  while dir != [0, 0]
+    @left_dist = mock_obj[:x] - obj2[:x]
+    @up_dist = mock_obj[:y] - obj2[:y]
+
+    puts "1"
+    mock_obj[:x] += dir[0]
+    mock_obj[:y] += dir[1]
+    #@map.place_char(-20 - mock_obj[:x], -20 - mock_obj[:x], "P", id: "sight")
+    #@map.get_object_by_id("sight")[:x] = mock_obj[:x]
+    #@map.get_object_by_id("sight")[:y] = mock_obj[:y]
+
+    puts "2"
+    if @map.get_object_by_loc(mock_obj[:x], mock_obj[:y])
+      return false
+    end
+
+    puts "3"
+    dir = get_optimal_dirs()
+    puts "4"
+  end
+  return true
+end
+
 def can_see(player, enemy, wall_array)
   fail = false
   slope = (enemy[:y].to_f - player[:y].to_f)/(enemy[:x].to_f - player[:x].to_f)
@@ -164,13 +195,13 @@ def can_see(player, enemy, wall_array)
   puts slope
   if (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2)) < 0
 	distance = (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2)) * -1
-  else 
+  else
 	distance = (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2))
   end
   distance = Math.sqrt(distance)
   distance = distance.round(3)
   puts distance
-  (distance/slope).to_i.times do 
+  (distance/slope).to_i.times do
 	wall_array.each do |wall|
 	  checkslope = (enemy[:y].to_f - wall[:y].to_f)/(enemy[:x].to_f - wall[:x].to_f)
 	  checkslope = checkslope.round(3)
@@ -186,19 +217,22 @@ def can_see(player, enemy, wall_array)
   end
 end
 
-def chase(obj1, obj2)
-  def get_optimal_dirs(fails=[])
-    if (@up_dist > 0 and @up_dist >= @left_dist) and !fails.include?([0, -1])
-      dir = [0, -1]
-    elsif (@up_dist < 0 and @up_dist < @left_dist) and !fails.include?([0, 1])
-      dir = [0, 1]
-    elsif (@left_dist > 0 and @left_dist >= @up_dist) and !fails.include?([-1, 0])
-      dir = [-1, 0]
-    elsif !fails.include?([1, 0])
-      dir = [1, 0]
-    end
-    return dir
+def get_optimal_dirs(fails=[])
+  if (@up_dist > 0 and @up_dist >= @left_dist) and !fails.include?([0, -1])
+    dir = [0, -1]
+  elsif (@up_dist < 0 and @up_dist < @left_dist) and !fails.include?([0, 1])
+    dir = [0, 1]
+  elsif (@left_dist > 0 and @left_dist >= @up_dist) and !fails.include?([-1, 0])
+    dir = [-1, 0]
+  elsif !fails.include?([1, 0])
+    dir = [1, 0]
+  else
+    return [0, 0]
   end
+  return dir
+end
+
+def chase(obj1, obj2)
   @left_dist = obj1[:x] - obj2[:x]
   @up_dist = obj1[:y] - obj2[:y]
 
