@@ -28,7 +28,7 @@ class RandomRoom
         else
           move_randomly(me)
         end
-		kill_player_if_touching(args[:id], "When trying to kiss an Alien, it decided to eat you")
+		    kill_player_if_touching(args[:id],["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien."][rand(0..1)])
       }
     })
 
