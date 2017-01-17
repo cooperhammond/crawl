@@ -86,7 +86,7 @@ def default_definitions()
     symbol: "#",
     type: 'block'
   })
-  
+
   @map.define_object("alien", {
       symbol: "A",
       type: "dynamic",
@@ -109,7 +109,7 @@ def default_definitions()
 		kill_player_if_touching(args[:id], "When trying to kiss an Alien, it decided to eat you")
       }
     })
-  
+
   @map.define_object("stairs", {
     symbol: ">",
     type: "dynamic",

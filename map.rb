@@ -64,6 +64,8 @@ class Map
       end
     end
     level.offset_map_by_name("player")
+
+
   end
 
   def turns
@@ -78,6 +80,10 @@ class Map
         end
       end
     end
+  end
+
+  def attack_move(obj, xy)
+
   end
 
   def delete_object_by_id(id)
@@ -105,8 +111,20 @@ class Map
     raise "\nno :symbol supplied" if !properties.key?(:symbol)
     raise "\n:symbols cannot be more than 1 character long: '#{properties[:symbol]}'" if properties[:symbol].length > 1
     raise "\nno :type supplied" if !properties.key?(:type)
+
     if !properties.key?(:color)
       properties[:color] = Gosu::Color::rgb(138, 138, 138)
+    end
+    if properties[:type] == "dynamic"
+      if !properties.key?(:hp)
+        properties[:hp] = 100
+      end
+      if !properties.key?(:take_damage)
+        properties[:take_damage] = ->(args, dmg) {
+          me = @map.get_object_by_id(args[:id])
+          me[:hp] -= dmg
+        }
+      end
     end
     @object_definitions[name] = properties
   end
@@ -173,7 +191,6 @@ class Map
       end
 	  end
 	end
-
   end
 
   def get_object_locs_by_name(name)
