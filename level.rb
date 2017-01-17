@@ -36,7 +36,7 @@ class RandomRoom
       width:  @map.width,
       height: @map.height,
       min_room_number: 5,
-      max_room_number: 15,
+      max_room_number: 8,
       min_room_width:  5,
       max_room_width: 20,
       min_room_height: 3,
