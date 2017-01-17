@@ -28,7 +28,7 @@ class RandomRoom
         else
           move_randomly(me)
         end
-		    kill_player_if_touching(args[:id],["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien."][rand(0..1)])
+		    kill_player_if_touching(args[:id],["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien.", "Alien claws, are, in fact, sharp.", "Once upon a time, you died.", "In the name of science, you discovered what an alien's stomach looks like.", "When unarmed, don't attempt battle."][rand(0..4)])
       }
     })
 
@@ -71,7 +71,7 @@ class RandomRoom
       ">" => ["player"],
     })
 
-    (0..0).each do |n|
+    (0..7).each do |n|
       randomly_place_object("alien", id: gen_id)
     end
 

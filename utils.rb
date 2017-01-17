@@ -251,7 +251,7 @@ def pend_killed_by(args)
 	  "A" => ["alien"],
     }
   )
-  args[0].new_text(args[1], {y_loc: 0.1, new_line: 50, sound: "text.wav", id: "death"})
+  args[0].new_text(args[1], {y_loc: 0.1, new_line: 50, sound: "text.wav", id: "death", right_border: $window.width - 300})
 end
 
 def kill_player_if_touching(id, words)

@@ -22,6 +22,7 @@ class Text
 
     # OPTIONS:
     # => input - true or false for getting and printing character input.
+	# => right_border - border to wrap on
     # => kerning - for changing the spacing between letters. Defaults to `size / 2`
     # => y_loc - changing where the y is
     # => x_loc - changing where the x is
@@ -32,6 +33,7 @@ class Text
     @input = opts[:input] || false
     @kerning = opts[:kerning] || @font.text_width(string) / string.length
     @color = opts[:color] || Gosu::Color::rgb(255, 255, 255)
+	@right_border = opts[:right_border] || @window.width
     if opts[:y_loc] == "center"
       @y_loc = (@window.height / 2) - (size / 2)
     elsif opts[:y_loc] != nil
@@ -40,9 +42,9 @@ class Text
       @y_loc = @window.height * 0.625
     end
     if opts[:x_loc] == "center"
-      @x_loc = (@window.width / 2) - (@font.text_width(@string.join("")))
+      @x_loc = (@right_border / 2) - (@font.text_width(@string.join("")))
     elsif opts[:x_loc] != nil
-      @x_loc = (@window.width * opts[:x_loc])
+      @x_loc = (@right_border * opts[:x_loc])
     else
       @x_loc = 0
     end
@@ -72,7 +74,7 @@ class Text
       l[:delay_counter] += 1
       moved = false
       @x_num += @kerning
-      if @x_num >= @window.width * 0.833333333 and (l[:letter] == ' ')
+      if @x_num >= @right_border * 0.833333333 and (l[:letter] == ' ')
         @x_num = @x_loc
         @y_num = @y_loc + (@new_line * l[:rows_down])
         rows_down += 1
