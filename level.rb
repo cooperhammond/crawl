@@ -23,17 +23,10 @@ class RandomRoom
       color: Gosu::Color::rgb(100, 255, 100),
       behavior: ->(args) {
         me = @map.get_object_by_id(args[:id])
-        if distance_from(@map.player, me) < 7
-          chase_psychopathically(me, @map.player)
+        if distance_from(me, @map.player) < 7
+          chase(me, @map.player)
         else
-          case rand(0..1)
-          when 1
-            move_x = rand(-1..1)
-            me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
-          when 0
-            move_y = rand(-1..1)
-            me[:y] += move_y if @map.valid_movement?([0, move_y], me)
-          end
+          move_randomly(me)
         end
 		kill_player_if_touching(args[:id], "When trying to kiss an Alien, it decided to eat you")
       }
@@ -78,7 +71,7 @@ class RandomRoom
       ">" => ["player"],
     })
 
-    (0..5).each do |n|
+    (0..0).each do |n|
       randomly_place_object("alien", id: gen_id)
     end
 

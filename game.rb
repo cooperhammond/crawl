@@ -31,9 +31,6 @@ class GameWindow < Gosu::Window
       @timer = Time.new
       exit
     end
-    if Gosu::button_down?(Gosu::KbZ)
-      puts "#{@map.player_offset_x}, #{@map.player_offset_y}"
-    end
     if Gosu::button_down?(Gosu::KbF)
       puts Gosu::fps
     end
@@ -58,7 +55,8 @@ class GameWindow < Gosu::Window
 		  @map.turns
 		end
 	rescue Exception => e
-		puts e
+		puts e.backtrace
+    puts e
 	end
     if @pending.any?
       send(@pending[0], @pending[1])

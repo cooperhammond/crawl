@@ -162,14 +162,18 @@ class Map
       end
     end
   end
-  
-  def get_object_by_loc(x, y)
+
+  def get_object_by_loc(x, y, exceptions=[])
 	level.grid.each do |loc, object|
 	  if "#{x} #{y}" == loc
-		return object
+      if !exceptions.include?(object[:name])
+	      return object
+      else
+        return false
+      end
 	  end
 	end
-	
+
   end
 
   def get_object_locs_by_name(name)
