@@ -37,7 +37,10 @@ class GameWindow < Gosu::Window
     if Gosu::button_down?(Gosu::KbF)
       puts Gosu::fps
     end
-
+	if Gosu::button_down?(Gosu::KbA) and Gosu::button_down?(Gosu::KbL) and Time.new - @timer > 0.5
+		@timer = Time.new
+		initialize(Map.new($x, $y))
+	end
     # Level updating and turns as well as any pending actions.
 	begin
     @map.level.grid.each do |loc, object|

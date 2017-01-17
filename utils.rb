@@ -86,6 +86,30 @@ def default_definitions()
     symbol: "#",
     type: 'block'
   })
+  
+  @map.define_object("alien", {
+      symbol: "A",
+      type: "dynamic",
+      hp: 100,
+      color: Gosu::Color::rgb(100, 255, 100),
+      behavior: ->(args) {
+        me = @map.get_object_by_id(args[:id])
+        if distance_from(@map.player, me) < 7
+          chase_psychopathically(me, @map.player)
+        else
+          case rand(0..1)
+          when 1
+            move_x = rand(-1..1)
+            me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
+          when 0
+            move_y = rand(-1..1)
+            me[:y] += move_y if @map.valid_movement?([0, move_y], me)
+          end
+        end
+		kill_player_if_touching(args[:id], "When trying to kiss an Alien, it decided to eat you")
+      }
+    })
+  
   @map.define_object("stairs", {
     symbol: ">",
     type: "dynamic",
@@ -224,21 +248,22 @@ def pend_killed_by(args)
   #window.clear
   args[0].map.reset
   args[0].map.create_from_grid(15, 10, [
-    "    _____ ",
-    "   /     \\",
-    "   I RIP I",
-    "   I  @  I",
-    "   I     I",
-    "   I___V_I",
-    " Y/.W..|./",
-    " |..|.../",
-    "/______/"], {
+    "     _____  ",
+    "    /     \\ ",
+    "    I RIP I ",
+    "    I  @  I ",
+    "    I     I ",
+    "    I___V_I ",
+    "  Y/.W..|./ ",
+    "  |..|.../ ",
+    " /______/ "], {
       "@" => ["player"],
       "V" => {color: Gosu::Color::rgb(200, 0, 0)},
       "W" => {color: Gosu::Color::rgb(146, 101, 173)},
       "Y" => {color: Gosu::Color::rgb(252, 237, 100)},
       "|" => {color: Gosu::Color::rgb(0, 179, 18)},
       "." => {color: Gosu::Color::rgb(88, 47, 37)},
+	  "A" => ["alien"],
     }
   )
   args[0].new_text(args[1], {y_loc: 0.1, new_line: 50, sound: "text.wav", id: "death"})

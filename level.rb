@@ -35,14 +35,15 @@ class RandomRoom
             me[:y] += move_y if @map.valid_movement?([0, move_y], me)
           end
         end
+		kill_player_if_touching(args[:id], "When trying to kiss an Alien, it decided to eat you")
       }
     })
 
     options = {
       width:  @map.width,
       height: @map.height,
-      min_room_number: 3,
-      max_room_number: 10,
+      min_room_number: 5,
+      max_room_number: 15,
       min_room_width:  5,
       max_room_width: 20,
       min_room_height: 3,
