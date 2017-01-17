@@ -157,63 +157,14 @@ def chase_psychopathically(obj1, obj2)
   end
 end
 
-def test_sight(obj1, obj2)
-  mock_obj = obj1.clone
-
-  @left_dist = mock_obj[:x] - obj2[:x]
-  @up_dist = mock_obj[:y] - obj2[:y]
-
-  dir = get_optimal_dirs()
-
-  while dir != [0, 0]
-    @left_dist = mock_obj[:x] - obj2[:x]
-    @up_dist = mock_obj[:y] - obj2[:y]
-
-    puts "1"
-    mock_obj[:x] += dir[0]
-    mock_obj[:y] += dir[1]
-    #@map.place_char(-20 - mock_obj[:x], -20 - mock_obj[:x], "P", id: "sight")
-    #@map.get_object_by_id("sight")[:x] = mock_obj[:x]
-    #@map.get_object_by_id("sight")[:y] = mock_obj[:y]
-
-    puts "2"
-    if @map.get_object_by_loc(mock_obj[:x], mock_obj[:y])
-      return false
-    end
-
-    puts "3"
-    dir = get_optimal_dirs()
-    puts "4"
-  end
-  return true
-end
-
-def can_see(player, enemy, wall_array)
-  fail = false
-  slope = (enemy[:y].to_f - player[:y].to_f)/(enemy[:x].to_f - player[:x].to_f)
-  slope = slope.round(3)
-  puts slope
-  if (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2)) < 0
-	distance = (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2)) * -1
-  else
-	distance = (((enemy[:x]-player[:x])^2)+((enemy[:y]-player[:y])^2))
-  end
-  distance = Math.sqrt(distance)
-  distance = distance.round(3)
-  puts distance
-  (distance/slope).to_i.times do
-	wall_array.each do |wall|
-	  checkslope = (enemy[:y].to_f - wall[:y].to_f)/(enemy[:x].to_f - wall[:x].to_f)
-	  checkslope = checkslope.round(3)
-	  if checkslope == slope
-		fail = true
-	  end
-	end
-  end
-  if fail == false
-	return true
-  else
-	return false
+def move_randomly(obj)
+  case rand(0..1)
+  when 0
+    move_x = rand(-1..1)
+    obj[:x] += move_x if @map.valid_movement?([move_x, 0], obj)
+  when 1
+    move_y = rand(-1..0)
+    obj[:y] += move_y if @map.valid_movement?([0, move_y], obj)
   end
 end
 
