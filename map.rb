@@ -82,7 +82,7 @@ class Map
     end
   end
 
-  def attack_move(obj, xy)
+  def attack_movement?(xy, obj)
 
   end
 
