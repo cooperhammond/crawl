@@ -35,8 +35,8 @@ class RandomRoom
     options = {
       width:  @map.width,
       height: @map.height,
-      min_room_number: 5,
-      max_room_number: 8,
+      min_room_number: 3,
+      max_room_number: 10,
       min_room_width:  5,
       max_room_width: 20,
       min_room_height: 3,
@@ -91,6 +91,8 @@ class RandomRoom
       end
       offset_map_by_name("player")
     end
+	randomly_place_object("npc", symbol: "N", id: gen_id, text: "Snide comment.", type: "dynamic",
+		text_opts: {x_loc: 0.78})
   end
 
   def update

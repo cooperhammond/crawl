@@ -148,7 +148,7 @@ def default_definitions()
     },
   })
   @map.define_object("npc", {
-    # takes the arguments :symbol, :id, :text
+    # takes the arguments :symbol, :id, :text, :text_opts
     symbol: "N",
     type: "block",
     behavior: ->(args) {
@@ -161,6 +161,7 @@ def default_definitions()
         args[:color].nil?
     }
   })
+  
 end
 
 def chase_psychopathically(obj1, obj2)

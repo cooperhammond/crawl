@@ -13,7 +13,7 @@ class Map
       type: 'dynamic',
       color: Gosu::Color::rgb(28, 185, 25),
       inventory: [],
-	  hp: 5,
+	  hp: 100,
     })
 
     @player_floor = 0

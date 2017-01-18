@@ -5,7 +5,9 @@ class GameWindow < Gosu::Window
   attr_accessor :texts
   attr_reader :map, :level, :zoom
   def initialize(map)
-    temp = Gosu::Window.new(1, 1)
+	@font = Gosu::Font.new(25)
+	
+	temp = Gosu::Window.new(1, 1)
     @scale = 25
     @text_height = @scale
     @zoom = 1.6
@@ -83,6 +85,8 @@ class GameWindow < Gosu::Window
     @texts.each do |text|
       text.draw
     end
+	
+	@font.draw("Score: #{@map.player_floor*-1}", 1100, 10, 10)
   end
 
   def new_text(words, opts={})
