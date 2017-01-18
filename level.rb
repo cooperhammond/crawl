@@ -91,6 +91,8 @@ class RandomRoom
       end
       offset_map_by_name("player")
     end
+	randomly_place_object("npc", symbol: "N", id: gen_id, text: "Snide comment.", type: "dynamic",
+		text_opts: {x_loc: 0.78})
   end
 
   def update

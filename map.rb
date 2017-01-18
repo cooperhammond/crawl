@@ -13,8 +13,12 @@ class Map
       type: 'dynamic',
       color: Gosu::Color::rgb(28, 185, 25),
       inventory: [],
+<<<<<<< HEAD
       current_weapon: "",
 	    hp: 5,
+=======
+	  hp: 100,
+>>>>>>> de0135cec91c86852062e1fb32f8776f2e3953dd
     })
 
     @player_floor = 0

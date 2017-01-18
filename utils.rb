@@ -98,7 +98,7 @@ def default_definitions()
   @map.define_object("sword", {
       symbol: "S",
       type: "item",
-      color: Gosu::Color::rbg()
+      color: Gosu::Color::rbg(255, 255, 255)
   })
 
   @map.define_object("alien", {
@@ -162,7 +162,7 @@ def default_definitions()
     },
   })
   @map.define_object("npc", {
-    # takes the arguments :symbol, :id, :text
+    # takes the arguments :symbol, :id, :text, :text_opts
     symbol: "N",
     type: "block",
     behavior: ->(args) {
@@ -175,6 +175,7 @@ def default_definitions()
         args[:color].nil?
     }
   })
+
 end
 
 def chase_psychopathically(obj1, obj2)

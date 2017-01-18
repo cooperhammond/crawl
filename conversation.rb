@@ -82,7 +82,7 @@ class Text
         l[:rows_down] = rows_down
       else
         if l[:delay_counter] >= @delay * l[:index]
-          @font.draw(l[:letter], @x_num, @y_num, 1, 1, 1, @color)
+          @font.draw(l[:letter], @x_num, @y_num, 10, 1, 1, @color)
           if l[:played] == false and l[:index] % @sound_delay == 0 and @sound != false and @input != true
             @sound.play(1)
             l[:played] = true
