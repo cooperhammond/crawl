@@ -79,7 +79,10 @@ def object_controls(object)
     if dir != nil
       if @map.valid_movement?(dir, object)
         if @map.attack_movement?(dir, object)
-        everything(dir)
+          @map.attack_object(dir, object, @map.player[:current_weapon][:dmg])
+        else
+          everything(dir)
+        end
       end
       return dir
     end
@@ -90,6 +93,12 @@ def default_definitions()
   @map.define_object("wall", {
     symbol: "#",
     type: 'block'
+  })
+
+  @map.define_object("sword", {
+      symbol: "S",
+      type: "item",
+      color: Gosu::Color::rbg()
   })
 
   @map.define_object("alien", {

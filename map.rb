@@ -13,7 +13,8 @@ class Map
       type: 'dynamic',
       color: Gosu::Color::rgb(28, 185, 25),
       inventory: [],
-	  hp: 5,
+      current_weapon: "",
+	    hp: 5,
     })
 
     @player_floor = 0
@@ -82,8 +83,22 @@ class Map
     end
   end
 
-  def attack_movement?(xy, obj)
+  def attack_movement?(n, obj)
+    # n => [x-being-moved, y-being-moved]
+    # object => some placed object
+    level.grid.each do |loc, properties|
+      if "#{properties[:x]} #{properties[:y]}" == "#{obj[:x] + n[0]} #{obj[:y] + n[1]}" and properties[:type] == "dynamic"
+        return true
+      end
+    end
+  end
 
+  def attack_object(n, obj, dmg)
+    level.grid.each do |loc, object|
+      if "#{object[:x]} #{object[:y]}" == "#{obj[:x] + n[0]} #{obj[:y] + n[1]}" and object[:type] == "dynamic"
+        object[:take_damage].call(object[:args], dmg)
+      end
+    end
   end
 
   def delete_object_by_id(id)
