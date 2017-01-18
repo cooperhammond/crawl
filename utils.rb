@@ -54,29 +54,34 @@ def level_box(params={width: 20, height: 10, x: 10, y: 10})
 end
 
 def object_controls(object)
-  def everything(xy, change)
+  def everything(xy)
     @map.level.grid.each do |loc, object|
-      object[xy] += change unless object[:symbol] == "@"
+      object[:x] -= xy[0] unless object[:symbol] == "@"
+      object[:y] -= xy[1] unless object[:symbol] == "@"
     end
   end
 
   if Time.new - @move_timer > 0.06
     @move_timer = Time.new
+    dir = nil
     if Gosu::button_down?(Gosu::KbUp)
-      everything(:y, 1) if @map.valid_movement?([0,-1], object)
-      return true
+      dir = [0, -1]
     end
     if Gosu::button_down?(Gosu::KbDown)
-      everything(:y, -1) if @map.valid_movement?([0,1], object)
-      return true
+      dir = [0, 1]
     end
     if Gosu::button_down?(Gosu::KbLeft)
-      everything(:x, 1) if @map.valid_movement?([-1,0], object)
-      return true
+      dir = [-1, 0]
     end
     if Gosu::button_down?(Gosu::KbRight)
-      everything(:x, -1) if @map.valid_movement?([1,0], object)
-      return true
+      dir = [1, 0]
+    end
+    if dir != nil
+      if @map.valid_movement?(dir, object)
+        if @map.attack_movement?(dir, object)
+        everything(dir)
+      end
+      return dir
     end
   end
 end
@@ -86,7 +91,7 @@ def default_definitions()
     symbol: "#",
     type: 'block'
   })
-  
+
   @map.define_object("alien", {
       symbol: "A",
       type: "dynamic",
@@ -109,7 +114,7 @@ def default_definitions()
 		kill_player_if_touching(args[:id], "When trying to kiss an Alien, it decided to eat you")
       }
     })
-  
+
   @map.define_object("stairs", {
     symbol: ">",
     type: "dynamic",
