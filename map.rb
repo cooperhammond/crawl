@@ -1,6 +1,6 @@
 class Map
   attr_reader :width, :height, :grid, :level, :player_x, :player_y, :player_floor
-  attr_accessor :player_offset_x, :player_offset_y
+  attr_accessor :player_offset_x, :player_offset_y, :player_turns
   def initialize(x, y)
     @width = x
     @height = y
@@ -25,6 +25,8 @@ class Map
     @player_offset_y = 0
 
     @dead_player = false
+
+    @player_turns = 0
   end
 
   def start_running
@@ -83,6 +85,7 @@ class Map
 
   def turns
     if level.update
+
       level.grid.each do |loc, object|
         if object.key?(:behavior)
           if object[:args] != {}
@@ -385,6 +388,11 @@ class Map
   end
 
   def turns
+    @player_turns += 1
+    if player[:hp] < 100 and @player_turns % 3 == 0
+      player[:hp] += 2
+    end
+
     level.grid.each do |loc, object|
       if object.key?(:behavior)
         if object[:args] != {}
