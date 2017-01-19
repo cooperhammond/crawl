@@ -18,6 +18,7 @@ class GameWindow < Gosu::Window
     @texts_height
 
     @map = map
+
     @box_width = 20
     super((@map.width * @text_width).round + (@text_width * @box_width).round, (@map.height * @text_height).round + @text_height)
     self.caption = ""

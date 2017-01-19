@@ -124,7 +124,7 @@ class Text
       end
     end
 
-    return rows_down * @size
+    return (rows_down * @size) + (rows_down * @new_line)
   end
 
   def input

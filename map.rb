@@ -7,13 +7,14 @@ class Map
     @object_definitions = {}
     @grid = {}
     @space = {symbol: ' ', type: 'block'}
+
     define_object("player", {
       symbol: "@",
 	    lvl: 1,
       type: 'player',
       color: Gosu::Color::rgb(28, 185, 25),
       inventory: [],
-      current_weapon: {dmg: 10},
+      current_weapon: {},
 	    hp: 100,
       killed_by: "You were killed by god."
     })
@@ -58,6 +59,12 @@ class Map
 
   def update
     level.grid.each do |loc, object|
+      if object[:type] == "enemy"
+        if object[:hp] <= 0
+          delete_object_by_true_loc(object[:x], object[:y])
+        end
+      end
+
       if object[:type] == "item"
         if "#{player[:x]} #{player[:y]}" == "#{object[:x]} #{object[:y]}"
           level.grid.delete(loc)
@@ -125,6 +132,14 @@ class Map
     end
   end
 
+  def delete_object_by_true_loc(x, y)
+    level.grid.each do |loc, object|
+      if "#{x} #{y}" == "#{object[:x]} #{object[:y]}"
+        level.grid.delete(loc)
+      end
+    end
+  end
+
   def define_object(name, properties={})
     # properties must resemble something like:
     # define_object("<new-name>", {
@@ -162,6 +177,17 @@ class Map
     if level.grid["#{x} #{y}"].key?(:initialize)
       level.grid["#{x} #{y}"][:initialize].call(args)
     end
+  end
+
+  def make_object(name, args={})
+    raise "\nthere is no object called '#{name}'" if !@object_definitions.key?(name)
+    args = args.merge(id: rand(0..1000000))
+    x, y = rand(1000..10000), rand(1000..10000)
+    level.grid["#{x} #{y}"] = @object_definitions[name].merge({x: x, y: y, name: name, args: args})
+    if level.grid["#{x} #{y}"].key?(:initialize)
+      level.grid["#{x} #{y}"][:initialize].call(args)
+    end
+    return level.grid["#{x} #{y}"]
   end
 
   def place_char(x, y, char, opts={})
@@ -260,6 +286,13 @@ class Map
     end
   end
 
+  def give_item(object_name)
+    player[:inventory].push(self.make_object(object_name))
+  end
+
+  def set_weapon(object_name)
+    player[:current_weapon] = self.make_object(object_name)
+  end
 
   def has_item?(object_name)
     player[:inventory].each do |item|

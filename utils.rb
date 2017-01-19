@@ -5,9 +5,16 @@ def universal_controls()
     @timer = Time.new
     exit
   end
+  if Gosu::button_down?(Gosu::KbS) and Time.new - @timer > 0.5
+    @timer = Time.new
+    pane_text("HP: #{@map.player[:hp]}\nLvl: #{@map.player[:lvl]}\nDmg: #{@map.player[:current_weapon][:dmg]}")
+  end
   if Gosu::button_down?(Gosu::KbI) and Time.new - @timer > 0.5
     @timer = Time.new
-    pane_text("HP: #{@map.player[:hp]}\nLvl: #{@map.player[:lvl]}")
+    pane_text("Inventory:")
+    @map.player[:inventory].each do |item|
+      pane_text("- #{item[:name]}")
+    end
   end
   if Gosu::button_down?(Gosu::KbF) and Time.new - @timer > 0.5
     @timer = Time.new
@@ -98,7 +105,9 @@ def object_controls(object)
     if dir != nil
       if @map.valid_movement?(dir, object)
         if @map.attack_movement?(dir, object)
-          @map.attack_object(dir, object, @map.player[:current_weapon][:dmg])
+          dmg = @map.player[:current_weapon][:dmg]
+          @map.attack_object(dir, object, dmg)
+          $window.pane_text("You attacked for #{dmg} damage!")
         else
           everything(dir)
         end
@@ -113,35 +122,6 @@ def default_definitions()
     symbol: "#",
     type: 'block'
   })
-
-  @map.define_object("sword", {
-      symbol: "S",
-      type: "item",
-      color: Gosu::Color::rgb(255, 255, 255)
-  })
-
-  @map.define_object("alien", {
-      symbol: "A",
-      type: "dynamic",
-      hp: 100,
-      color: Gosu::Color::rgb(100, 255, 100),
-      behavior: ->(args) {
-        me = @map.get_object_by_id(args[:id])
-        if distance_from(@map.player, me) < 7
-          chase_psychopathically(me, @map.player)
-        else
-          case rand(0..1)
-          when 1
-            move_x = rand(-1..1)
-            me[:x] += move_x if @map.valid_movement?([move_x, 0], me)
-          when 0
-            move_y = rand(-1..1)
-            me[:y] += move_y if @map.valid_movement?([0, move_y], me)
-          end
-        end
-		kill_player_if_touching(args[:id], "When trying to kiss an Alien, it decided to eat you")
-      }
-    })
 
   @map.define_object("stairs", {
     symbol: ">",
@@ -190,6 +170,17 @@ def default_definitions()
     initialize: ->(args) {
       @map.get_object_by_id(args[:id])[:symbol] = args[:symbol] unless args[:symbol].nil?
       @map.get_object_by_id(args[:id])[:color] = args[:color] unless args[:color].nil?
+    }
+  })
+
+  @map.define_object("weapon", {
+    symbol: " ",
+    type: "item",
+    initialize: ->(args) {
+      me = @map.get_object_by_id(args[:id])
+      me[:dmg] = rand(40..100)
+      me[:symbol] = ["L", "c", "I", "}"][rand(0..3)]
+      me[:name] = "Hairy Knuckles"
     }
   })
 

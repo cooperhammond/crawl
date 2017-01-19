@@ -22,6 +22,7 @@ class RandomRoom
       hp: 100,
       dmg: 10,
       color: Gosu::Color::rgb(100, 255, 100),
+      killed_by: ["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien.", "Alien spit, does, in fact, burn.", "Once upon a time, you died.", "In the name of science, you discovered what an alien's stomach looks like.", "When unarmed, don't attempt battle."][rand(0..4)],
       behavior: ->(args) {
         me = @map.get_object_by_id(args[:id])
         if distance_from(me, @map.player) < 7
@@ -31,7 +32,6 @@ class RandomRoom
         end
         passive_damage(me)
       },
-      killed_by: ["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien.", "Alien spit, does, in fact, burn.", "Once upon a time, you died.", "In the name of science, you discovered what an alien's stomach looks like.", "When unarmed, don't attempt battle."][rand(0..4)],
     })
 
     options = {
@@ -93,8 +93,10 @@ class RandomRoom
       end
       offset_map_by_name("player")
     end
-	randomly_place_object("npc", symbol: "N", id: gen_id, text: "Snide comment.", type: "dynamic",
+	  randomly_place_object("npc", symbol: "N", id: gen_id, text: "What a poseur.", type: "dynamic", \
 		text_opts: {x_loc: 0.78})
+
+    @map.set_weapon("weapon")
   end
 
   def update

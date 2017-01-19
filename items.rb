@@ -1,4 +1,4 @@
-class Weapon
+class RandomWeapon
 	attr_reader :name, :damage
 	def initailize(tier, type)
 		@tiers = {
