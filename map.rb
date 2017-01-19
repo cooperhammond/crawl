@@ -10,15 +10,12 @@ class Map
     define_object("player", {
       symbol: "@",
 	    lvl: 1,
-      type: 'dynamic',
+      type: 'player',
       color: Gosu::Color::rgb(28, 185, 25),
       inventory: [],
-<<<<<<< HEAD
-      current_weapon: "",
-	    hp: 5,
-=======
-	  hp: 100,
->>>>>>> de0135cec91c86852062e1fb32f8776f2e3953dd
+      current_weapon: {dmg: 10},
+	    hp: 100,
+      killed_by: "You were killed by god."
     })
 
     @player_floor = 0
@@ -26,7 +23,7 @@ class Map
     @player_offset_x = 0
     @player_offset_y = 0
 
-
+    @dead_player = false
   end
 
   def start_running
@@ -68,9 +65,13 @@ class Map
         end
       end
     end
+
+    if player[:hp] <= 0 and @dead_player != true
+      @dead_player = true
+      killed_by(player[:killed_by])
+    end
+
     level.offset_map_by_name("player")
-
-
   end
 
   def turns
@@ -91,18 +92,25 @@ class Map
     # n => [x-being-moved, y-being-moved]
     # object => some placed object
     level.grid.each do |loc, properties|
-      if "#{properties[:x]} #{properties[:y]}" == "#{obj[:x] + n[0]} #{obj[:y] + n[1]}" and properties[:type] == "dynamic"
+      if "#{properties[:x]} #{properties[:y]}" == "#{obj[:x] + n[0]} #{obj[:y] + n[1]}" and properties[:type] == "enemy"
         return true
       end
     end
+    return false
   end
 
   def attack_object(n, obj, dmg)
     level.grid.each do |loc, object|
-      if "#{object[:x]} #{object[:y]}" == "#{obj[:x] + n[0]} #{obj[:y] + n[1]}" and object[:type] == "dynamic"
+      if "#{object[:x]} #{object[:y]}" == "#{obj[:x] + n[0]} #{obj[:y] + n[1]}" and object[:type] == "enemy"
         object[:take_damage].call(object[:args], dmg)
       end
     end
+  end
+
+  def damage_player(dmg, words)
+    player[:hp] -= dmg
+    player[:killed_by] = words
+    @window.pane_text("You took #{dmg} damage!")
   end
 
   def delete_object_by_id(id)
@@ -121,7 +129,7 @@ class Map
     # properties must resemble something like:
     # define_object("<new-name>", {
     #   symbol: "g",   # cannot be longer than one character long
-    #   type: "item",   # possible types: dynamic, item, block
+    #   type: "item",   # possible types: dynamic, item, block, enemy
     #   color: Gosu::Color::rgb(<r>, <g>, <b>),   # optional
     #   id: 1,   # optional. can be pretty much any arbitrary value
     #   function: ->(args) { <pretty-much-any-code } # TODO: make this a thing.
@@ -134,13 +142,13 @@ class Map
     if !properties.key?(:color)
       properties[:color] = Gosu::Color::rgb(138, 138, 138)
     end
-    if properties[:type] == "dynamic"
+    if properties[:type] == "enemy"
       if !properties.key?(:hp)
         properties[:hp] = 100
       end
       if !properties.key?(:take_damage)
         properties[:take_damage] = ->(args, dmg) {
-          me = @map.get_object_by_id(args[:id])
+          me = self.get_object_by_id(args[:id])
           me[:hp] -= dmg
         }
       end
@@ -269,8 +277,13 @@ class Map
       return false
     end
     level.grid.each do |loc, properties|
-      if "#{properties[:x]} #{properties[:y]}" == "#{object[:x] + n[0]} #{object[:y] + n[1]}" and properties[:type] == "block"
-        return false
+      if "#{properties[:x]} #{properties[:y]}" == "#{object[:x] + n[0]} #{object[:y] + n[1]}"
+        if object[:type] == "enemy" and properties[:type] == "player"
+          return false
+        end
+        if properties[:type] == "block"
+          return false
+        end
       end
     end
   end

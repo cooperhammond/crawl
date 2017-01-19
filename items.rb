@@ -2,8 +2,8 @@ class Weapon
 	attr_reader :name, :damage
 	def initailize(tier, type)
 		@tiers = {
-            '1' => {'0' => "iron"},
-            '2' => {'0' => "steel"},
+      '1' => {'0' => "iron"},
+      '2' => {'0' => "steel"},
 			'3' => {'0' => "orcish"},
 			'4' => {'0' => "elvish"},
 			'5' => {'0' => "dwarvish"},

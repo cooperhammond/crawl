@@ -1,5 +1,24 @@
 $ids = []
 
+def universal_controls()
+  if Gosu::button_down?(Gosu::KbQ) and Gosu::button_down?(Gosu::KbP) and Time.new - @timer > 0.5
+    @timer = Time.new
+    exit
+  end
+  if Gosu::button_down?(Gosu::KbI) and Time.new - @timer > 0.5
+    @timer = Time.new
+    pane_text("HP: #{@map.player[:hp]}\nLvl: #{@map.player[:lvl]}")
+  end
+  if Gosu::button_down?(Gosu::KbF) and Time.new - @timer > 0.5
+    @timer = Time.new
+    pane_text("The current fps is #{Gosu::fps.to_s}")
+  end
+  if Gosu::button_down?(Gosu::KbA) and Gosu::button_down?(Gosu::KbL) and Time.new - @timer > 0.5
+    @timer = Time.new
+    initialize(Map.new($x, $y))
+  end
+end
+
 def gen_id
   id = rand(0..100000)
   if !$ids.include?(id)
@@ -98,7 +117,7 @@ def default_definitions()
   @map.define_object("sword", {
       symbol: "S",
       type: "item",
-      color: Gosu::Color::rbg(255, 255, 255)
+      color: Gosu::Color::rgb(255, 255, 255)
   })
 
   @map.define_object("alien", {
@@ -164,15 +183,13 @@ def default_definitions()
   @map.define_object("npc", {
     # takes the arguments :symbol, :id, :text, :text_opts
     symbol: "N",
-    type: "block",
+    type: "dynamic",
     behavior: ->(args) {
       talk(args[:text], args[:id], args[:text_opts])
     },
     initialize: ->(args) {
-      @map.get_object_by_id(args[:id])[:symbol] = args[:symbol] unless\
-        args[:symbol].nil?
-      @map.get_object_by_id(args[:id])[:color] = args[:color] unless\
-        args[:color].nil?
+      @map.get_object_by_id(args[:id])[:symbol] = args[:symbol] unless args[:symbol].nil?
+      @map.get_object_by_id(args[:id])[:color] = args[:color] unless args[:color].nil?
     }
   })
 
@@ -242,6 +259,15 @@ end
 
 def killed_by(words)
   $window.set_pending("pend_killed_by", [$window, words])
+  $window.texts = []
+end
+
+def passive_damage(obj)
+  @map.level.grid.each do |loc, player|
+    if player[:symbol] == "@" and @map.are_touching?(obj, player)
+      @map.damage_player(obj[:dmg], obj[:killed_by])
+    end
+  end
 end
 
 def pend_killed_by(args)

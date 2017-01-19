@@ -18,8 +18,9 @@ class RandomRoom
 
     @map.define_object("alien", {
       symbol: "A",
-      type: "dynamic",
+      type: "enemy",
       hp: 100,
+      dmg: 10,
       color: Gosu::Color::rgb(100, 255, 100),
       behavior: ->(args) {
         me = @map.get_object_by_id(args[:id])
@@ -28,8 +29,9 @@ class RandomRoom
         else
           move_randomly(me)
         end
-		    kill_player_if_touching(args[:id],["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien.", "Alien claws, are, in fact, sharp.", "Once upon a time, you died.", "In the name of science, you discovered what an alien's stomach looks like.", "When unarmed, don't attempt battle."][rand(0..4)])
-      }
+        passive_damage(me)
+      },
+      killed_by: ["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien.", "Alien spit, does, in fact, burn.", "Once upon a time, you died.", "In the name of science, you discovered what an alien's stomach looks like.", "When unarmed, don't attempt battle."][rand(0..4)],
     })
 
     options = {

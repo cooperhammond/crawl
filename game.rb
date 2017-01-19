@@ -6,14 +6,17 @@ class GameWindow < Gosu::Window
   attr_reader :map, :level, :zoom
   def initialize(map)
 	@font = Gosu::Font.new(25)
-	
+
 	temp = Gosu::Window.new(1, 1)
     @scale = 25
     @text_height = @scale
     @zoom = 1.6
     @font = Gosu::Font.new(temp, "./courier.ttf", @text_height)
+
     @texts = []
     @text_width = @font.text_width("!")
+    @texts_height
+
     @map = map
     @box_width = 20
     super((@map.width * @text_width).round + (@text_width * @box_width).round, (@map.height * @text_height).round + @text_height)
@@ -23,48 +26,41 @@ class GameWindow < Gosu::Window
 	  $window = self
     @map.give_window(self)
     @map.start_running
-	@map.get_object_by_loc(0, 0)
+	  @map.get_object_by_loc(0, 0)
+
+    @height = self.height.to_s.to_f
 
   end
 
   def update
-    # Universal controls.
-    if Gosu::button_down?(Gosu::KbQ) and Gosu::button_down?(Gosu::KbP) and Time.new - @timer > 0.5
-      @timer = Time.new
-      exit
-    end
-    if Gosu::button_down?(Gosu::KbF)
-      puts Gosu::fps
-    end
-	if Gosu::button_down?(Gosu::KbA) and Gosu::button_down?(Gosu::KbL) and Time.new - @timer > 0.5
-		@timer = Time.new
-		initialize(Map.new($x, $y))
-	end
+    universal_controls() # Universal controls.
+
     # Level updating and turns as well as any pending actions.
-	begin
-    @map.level.grid.each do |loc, object|
-      if object.key?(:keys)
-        if object.key?(:args)
-          object[:keys].call(object[:args])
-        else
-          object[:keys].call
+  	begin
+      @map.level.grid.each do |loc, object|
+        if object.key?(:keys)
+          if object.key?(:args)
+            object[:keys].call(object[:args])
+          else
+            object[:keys].call
+          end
         end
       end
-    end
-    @map.update
-		if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
-		  @timer = Time.new
-		  @map.turns
-		end
-	rescue Exception => e
-		puts e.backtrace
-    puts e
-	end
+      @map.update
+  		if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
+  		  @timer = Time.new
+  		  @map.turns
+  		end
+  	rescue Exception => e
+  		puts e.backtrace
+      puts e
+  	end
     if @pending.any?
       send(@pending[0], @pending[1])
       @pending = []
     end
   end
+
 
   def draw
     Gosu::draw_rect(self.width - (@text_width * @box_width), 0, self.width - (self.width / (@text_width * @box_width)), self.height, Gosu::Color::rgb(0, 0, 0), 2)
@@ -85,12 +81,37 @@ class GameWindow < Gosu::Window
     @texts.each do |text|
       text.draw
     end
-	
-	@font.draw("Score: #{@map.player_floor*-1}", 1100, 10, 10)
+
+	   @font.draw("Floor: #{@map.player_floor * -1}", 1100, 10, 10)
   end
 
   def new_text(words, opts={})
     @texts.push(Text.new(self, words, "courier.ttf", 30, opts))
+  end
+
+  def pane_text(words, opts={})
+    if complete_text_height * @height >= @height - 100
+
+      first_text_height = @texts[0].total_text_height
+
+      @texts.shift
+      @texts.each do |text|
+        text.y_loc -= first_text_height
+      end
+    end
+
+    @texts.push(Text.new(self, words, "courier.ttf", 30, \
+      opts.merge({x_loc: (self.width - (@text_width * @box_width)) / self.width, \
+      y_loc: complete_text_height,\
+      new_line: @text_height, sound: "./text.wav"})))
+  end
+
+  def complete_text_height
+    height = 0
+    @texts.each do |text|
+      height += text.total_text_height
+    end
+    return height / self.height.to_s.to_f
   end
 
   def get_text_by_id(id)

@@ -2,12 +2,14 @@ require 'gosu'
 
 class Text
   attr_reader :id
+  attr_accessor :x_loc, :y_loc
   def initialize(window, string, font, size, opts={})
     @window = window
     @id = opts[:id]
     @letters = []
     @string = string.split(//)
-    @font = Gosu::Font.new(@window, "./#{font}", size)
+    @size = size
+    @font = Gosu::Font.new(@window, "./#{font}", @size)
     index = 0
     @string.each do |l|
       index += 1
@@ -22,7 +24,7 @@ class Text
 
     # OPTIONS:
     # => input - true or false for getting and printing character input.
-	# => right_border - border to wrap on
+	  # => right_border - border to wrap on
     # => kerning - for changing the spacing between letters. Defaults to `size / 2`
     # => y_loc - changing where the y is
     # => x_loc - changing where the x is
@@ -31,9 +33,9 @@ class Text
     # => new_line - the distance between each new line
     # => color - takes an array of [alpha, red, green, blue]
     @input = opts[:input] || false
-    @kerning = opts[:kerning] || @font.text_width(string) / string.length
+    @kerning = opts[:kerning] || @font.text_width(string.tr("\n", "")) / string.length
     @color = opts[:color] || Gosu::Color::rgb(255, 255, 255)
-	@right_border = opts[:right_border] || @window.width
+    @right_border = opts[:right_border] || @window.width
     if opts[:y_loc] == "center"
       @y_loc = (@window.height / 2) - (size / 2)
     elsif opts[:y_loc] != nil
@@ -61,6 +63,7 @@ class Text
     @alphabet = "    abcdefghijklmnopqrstuvwxyz1234567890     -=[]\\#;'`,./".split(//)
     @correspo = "    ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()     _+{}|#:\"~<>?".split(//)
     @input_delay = 0
+
   end
 
   def draw
@@ -71,10 +74,19 @@ class Text
     @x_num = @x_loc
     @y_num = @y_loc
     @letters.each do |l|
+      if l[:letter] == "\n"
+        @x_num = @x_loc
+        @y_num = @y_loc + (@new_line * l[:rows_down])
+        rows_down += 1
+
+        l[:rows_down] = rows_down
+
+        next
+      end
       l[:delay_counter] += 1
       moved = false
       @x_num += @kerning
-      if @x_num >= @right_border * 0.833333333 and (l[:letter] == ' ')
+      if @x_num >= @right_border * 0.94 and (l[:letter] == ' ')
         @x_num = @x_loc
         @y_num = @y_loc + (@new_line * l[:rows_down])
         rows_down += 1
@@ -90,6 +102,29 @@ class Text
         end
       end
     end
+  end
+
+  def total_text_height()
+    total_height = @size
+
+    rows_down = 1
+    x_num = @x_loc
+    y_num = @y_loc
+
+    @letters.each do |l|
+      l[:delay_counter] += 1
+      moved = false
+      x_num += @kerning
+      if x_num >= @right_border * 0.94 and (l[:letter] == ' ')
+        x_num = x_loc
+        y_num = y_loc + (@new_line * l[:rows_down])
+        rows_down += 1
+
+        l[:rows_down] = rows_down
+      end
+    end
+
+    return rows_down * @size
   end
 
   def input
