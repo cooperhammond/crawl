@@ -21,6 +21,7 @@ class Map
 
     @player_floor = 0
 
+
     @player_offset_x = 0
     @player_offset_y = 0
 
@@ -52,6 +53,15 @@ class Map
     if !@grid.key?(@player_floor)
       @grid[@player_floor] = RandomRoom.new(self, "next", @window)
       level.place_stuff
+      player[:lvl] = @player_floor * -1
+
+      player[:hp] *= (1 + (0.1 * player[:lvl]))
+      player[:current_weapon][:dmg] *= (1 + (0.2 * player[:lvl]))
+
+      player[:hp] = player[:hp].to_i
+      player[:current_weapon][:dmg] = player[:current_weapon][:dmg].to_i
+
+      @window.texts = []
     end
   end
 
@@ -120,7 +130,7 @@ class Map
   def damage_player(dmg, words)
     player[:hp] -= dmg
     player[:killed_by] = words
-    @window.pane_text("You took #{dmg} damage!")
+    @window.pane_text("You took #{dmg}\ndamage!")
   end
 
   def delete_object_by_id(id)

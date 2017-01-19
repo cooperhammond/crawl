@@ -19,8 +19,8 @@ class RandomRoom
     @map.define_object("alien", {
       symbol: "A",
       type: "enemy",
-      hp: 100,
-      dmg: 10,
+      hp: rand(50..150),
+      dmg: rand(5..20),
       color: Gosu::Color::rgb(100, 255, 100),
       killed_by: ["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien.", "Alien spit, does, in fact, burn.", "Once upon a time, you died.", "In the name of science, you discovered what an alien's stomach looks like.", "When unarmed, don't attempt battle."][rand(0..4)],
       behavior: ->(args) {
@@ -32,6 +32,19 @@ class RandomRoom
         end
         passive_damage(me)
       },
+      initialize: ->(args) {
+        me = @map.get_object_by_id(args[:id])
+        if args[:color] == "orange"
+          me[:color] = Gosu::Color::rgb(244, 191, 66)
+          me[:hp] = rand(150..250)
+          me[:dmg] = rand(20..40)
+        end
+        if args[:color] == "red"
+          me[:color] = Gosu::Color::rgb(255, 10, 10)
+          me[:hp] = rand(350..500)
+          me[:dmg] = rand(70..90)
+        end
+      }
     })
 
     options = {
@@ -74,7 +87,23 @@ class RandomRoom
     })
 
     (0..7).each do |n|
-      randomly_place_object("alien", id: gen_id)
+      if @map.player_floor * -1 >= 2
+        color = ["orange", "", ""][rand(0..2)]
+      end
+      if @map.player_floor * -1 >= 4
+        color = ["red", "orange", ""][rand(0..2)]
+      end
+      if @map.player_floor * -1 >= 6
+        color = ["red", "orange", "orange"][rand(0..2)]
+      end
+      if @map.player_floor * -1 >= 8
+        color = ["red", "red", "orange"][rand(0..2)]
+      end
+      if @map.player_floor * -1 >= 10
+        color = "red"
+      end
+
+      randomly_place_object("alien", id: gen_id, color: color)
     end
 
     randomly_place_object("stairs", id: "descend", num: -1)
@@ -93,8 +122,6 @@ class RandomRoom
       end
       offset_map_by_name("player")
     end
-	  randomly_place_object("npc", symbol: "N", id: gen_id, text: "What a poseur.", type: "dynamic", \
-		text_opts: {x_loc: 0.78})
 
     @map.set_weapon("weapon")
   end

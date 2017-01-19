@@ -1,21 +1,27 @@
 $ids = []
 
 def universal_controls()
+  if Gosu::button_down?(Gosu::KbH) and Time.new - @timer > 0.5
+    @timer = Time.new
+    pane_text("'qp' to quit\n'al' to restart\n's' for stats\n'w' to wait one turn")
+  end
+
   if Gosu::button_down?(Gosu::KbQ) and Gosu::button_down?(Gosu::KbP) and Time.new - @timer > 0.5
     @timer = Time.new
     exit
   end
   if Gosu::button_down?(Gosu::KbS) and Time.new - @timer > 0.5
     @timer = Time.new
-    pane_text("HP: #{@map.player[:hp]}\nLvl: #{@map.player[:lvl]}\nDmg: #{@map.player[:current_weapon][:dmg]}")
+    pane_text("HP: #{@map.player[:hp]}\nLvl: #{@map.player_floor * -1}\nDmg: #{@map.player[:current_weapon][:dmg]}")
   end
-  if Gosu::button_down?(Gosu::KbI) and Time.new - @timer > 0.5
-    @timer = Time.new
-    pane_text("Inventory:")
-    @map.player[:inventory].each do |item|
-      pane_text("- #{item[:name]}")
-    end
-  end
+
+  #if Gosu::button_down?(Gosu::KbI) and Time.new - @timer > 0.5
+  #  @timer = Time.new
+  #  pane_text("Inventory:")
+  #  @map.player[:inventory].each do |item|
+  #    pane_text("- #{item[:name]}")
+  #  end
+  #end
   if Gosu::button_down?(Gosu::KbF) and Time.new - @timer > 0.5
     @timer = Time.new
     pane_text("The current fps is #{Gosu::fps.to_s}")
@@ -106,7 +112,7 @@ def object_controls(object)
       if @map.valid_movement?(dir, object)
         if @map.attack_movement?(dir, object)
           dmg = @map.player[:current_weapon][:dmg]
-          @map.attack_object(dir, object, dmg)
+          @map.attack_object(dir, object, rand(dmg - 10..dmg + 10))
           $window.pane_text("You attacked for #{dmg} damage!")
         else
           everything(dir)
@@ -165,7 +171,7 @@ def default_definitions()
     symbol: "N",
     type: "dynamic",
     behavior: ->(args) {
-      talk(args[:text], args[:id], args[:text_opts])
+      talk(args[:text])
     },
     initialize: ->(args) {
       @map.get_object_by_id(args[:id])[:symbol] = args[:symbol] unless args[:symbol].nil?
@@ -178,9 +184,9 @@ def default_definitions()
     type: "item",
     initialize: ->(args) {
       me = @map.get_object_by_id(args[:id])
-      me[:dmg] = rand(40..100)
+      me[:dmg] = 60
       me[:symbol] = ["L", "c", "I", "}"][rand(0..3)]
-      me[:name] = "Hairy Knuckles"
+      me[:name] = "Finger Gun"
     }
   })
 

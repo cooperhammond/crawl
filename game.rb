@@ -31,6 +31,8 @@ class GameWindow < Gosu::Window
 
     @height = self.height.to_s.to_f
 
+    pane_text("Press 'h' for help!")
+
   end
 
   def update
@@ -82,8 +84,6 @@ class GameWindow < Gosu::Window
     @texts.each do |text|
       text.draw
     end
-
-	   @font.draw("Floor: #{@map.player_floor * -1}", 1100, 10, 10)
   end
 
   def new_text(words, opts={})
