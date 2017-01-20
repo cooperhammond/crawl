@@ -216,7 +216,7 @@ def move_randomly(obj)
     move_x = rand(-1..1)
     obj[:x] += move_x if @map.valid_movement?([move_x, 0], obj)
   when 1
-    move_y = rand(-1..0)
+    move_y = rand(-1..1)
     obj[:y] += move_y if @map.valid_movement?([0, move_y], obj)
   end
 end
