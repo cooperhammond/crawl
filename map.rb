@@ -55,8 +55,8 @@ class Map
       level.place_stuff
       player[:lvl] = @player_floor * -1
 
-      player[:hp] *= (1 + (0.1 * player[:lvl]))
-      player[:current_weapon][:dmg] *= (1 + (0.2 * player[:lvl]))
+      player[:hp] *= (1 + (0.2 * player[:lvl]))
+      player[:current_weapon][:dmg] *= (1 + (0.4 * player[:lvl]))
 
       player[:hp] = player[:hp].to_i
       player[:current_weapon][:dmg] = player[:current_weapon][:dmg].to_i
