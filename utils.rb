@@ -1,17 +1,36 @@
 $ids = []
 
-def universal_controls()
-  if Gosu::button_down?(Gosu::KbH) and Time.new - @timer > 0.5
+def check_timer(time=0.5)
+  if Time.new - @timer > time
     @timer = Time.new
-    pane_text("'qp' to quit\n'al' to restart\n's' for stats\n'w' to wait one turn")
+    return true
+  else
+    return false
+  end
+end
+
+def universal_controls(window)
+  if Gosu::button_down?(Gosu::KbEscape) and check_timer
+    window.fullscreen = !window.fullscreen?
+  end
+  if Gosu::button_down?(Gosu::KbC) and check_timer
+    window.texts = []
+  end
+  if Gosu::button_down?(Gosu::KbH) and check_timer
+    pane_text("
+'c' to clear sidebar
+'qp' to quit
+'al' to restart
+'s' for stats
+'w' to wait one turn
+escape-key to toggle fullscreen
+")
   end
 
-  if Gosu::button_down?(Gosu::KbQ) and Gosu::button_down?(Gosu::KbP) and Time.new - @timer > 0.5
-    @timer = Time.new
+  if Gosu::button_down?(Gosu::KbQ) and Gosu::button_down?(Gosu::KbP) and check_timer
     exit
   end
-  if Gosu::button_down?(Gosu::KbS) and Time.new - @timer > 0.5
-    @timer = Time.new
+  if Gosu::button_down?(Gosu::KbS) and check_timer
     pane_text("HP: #{@map.player[:hp]}\nLvl: #{@map.player_floor * -1}\nDmg: #{@map.player[:current_weapon][:dmg]}")
   end
 
@@ -249,6 +268,10 @@ def chase(obj1, obj2)
   while !@map.valid_movement?(dir, obj1)
     fails.push(dir)
     dir = get_optimal_dirs(fails)
+    if fails.size >= 5
+      dir = [0, 0]
+      break
+    end
   end
   obj1[:x] += dir[0]
   obj1[:y] += dir[1]

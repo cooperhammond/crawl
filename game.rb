@@ -5,9 +5,9 @@ class GameWindow < Gosu::Window
   attr_accessor :texts
   attr_reader :map, :level, :zoom
   def initialize(map)
-	@font = Gosu::Font.new(25)
+	  @font = Gosu::Font.new(25)
 
-	temp = Gosu::Window.new(1, 1)
+	  temp = Gosu::Window.new(1, 1)
     @scale = 25
     @text_height = @scale
     @zoom = 1.6
@@ -22,6 +22,8 @@ class GameWindow < Gosu::Window
     @box_width = 20
     super((@map.width * @text_width).round + (@text_width * @box_width).round, (@map.height * @text_height).round + @text_height)
     self.caption = ""
+    self.fullscreen = false
+
     @pending = []
     @timer = Time.new
 	  $window = self
@@ -36,7 +38,7 @@ class GameWindow < Gosu::Window
   end
 
   def update
-    universal_controls() # Universal controls.
+    universal_controls(self) # Universal controls.
 
     # Level updating and turns as well as any pending actions.
   	begin
@@ -91,13 +93,21 @@ class GameWindow < Gosu::Window
   end
 
   def pane_text(words, opts={})
+    if @texts.size >= 8
+      @texts = []
+    end
+
+    temp_text = Text.new(self, words, "courier.ttf", 30, \
+      opts.merge({x_loc: (self.width - (@text_width * @box_width)) / self.width, \
+      new_line: @text_height, sound: "./text.wav"}))
+
     if complete_text_height * @height >= @height - 100
 
       first_text_height = @texts[0].total_text_height
 
       @texts.shift
       @texts.each do |text|
-        text.y_loc -= first_text_height
+        text.y_loc -= temp_text.total_text_height
       end
     end
 
@@ -107,12 +117,12 @@ class GameWindow < Gosu::Window
       new_line: @text_height, sound: "./text.wav"})))
   end
 
-  def complete_text_height
+  def complete_text_height()
     height = 0
     @texts.each do |text|
       height += text.total_text_height
     end
-    return height / self.height.to_s.to_f
+    return (height) / self.height.to_s.to_f
   end
 
   def get_text_by_id(id)

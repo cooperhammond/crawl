@@ -25,12 +25,12 @@ class RandomRoom
       killed_by: ["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien.", "Alien spit, does, in fact, burn.", "Once upon a time, you died.", "In the name of science, you discovered what an alien's stomach looks like.", "When unarmed, don't attempt battle.", "The key to success is not dying.", "What a surprise, you died.", "You were supposed to stay alive.", "*snide 'you died' comment*", "Here's a grave because we reward failure."][rand(0..10)],
       behavior: ->(args) {
         me = @map.get_object_by_id(args[:id])
+        passive_damage(me)
         if distance_from(me, @map.player) < 7
           chase(me, @map.player)
         else
           move_randomly(me)
         end
-        passive_damage(me)
       },
       initialize: ->(args) {
         me = @map.get_object_by_id(args[:id])

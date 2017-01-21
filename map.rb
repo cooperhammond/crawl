@@ -16,6 +16,7 @@ class Map
       inventory: [],
       current_weapon: {},
 	    hp: 100,
+      max_hp: 100,
       killed_by: "You were killed by god."
     })
 
@@ -55,10 +56,10 @@ class Map
       level.place_stuff
       player[:lvl] = @player_floor * -1
 
-      player[:hp] *= (1 + (0.2 * player[:lvl]))
+      player[:max_hp] *= (1 + (0.2 * player[:lvl]))
       player[:current_weapon][:dmg] *= (1 + (0.4 * player[:lvl]))
 
-      player[:hp] = player[:hp].to_i
+      player[:max_hp] = player[:max_hp].to_i
       player[:current_weapon][:dmg] = player[:current_weapon][:dmg].to_i
 
       @window.texts = []
@@ -399,7 +400,7 @@ class Map
 
   def turns
     @player_turns += 1
-    if player[:hp] < 100 and @player_turns % 3 == 0
+    if player[:hp] < player[:max_hp] and @player_turns % 3 == 0
       player[:hp] += 2
     end
 
