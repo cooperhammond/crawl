@@ -1,2 +1,4 @@
+source 'https://rubygems.org'
+
 gem "gosu"
-gem "meiro"
+gem "meiro", path: "meiro/"

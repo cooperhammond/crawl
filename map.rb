@@ -32,7 +32,7 @@ class Map
   end
 
   def start_running
-    @grid[@player_floor] = RandomRoom.new(self, "new", @window)
+    @grid[@player_floor] = RandomRoom.new(self, "new", @window, @player_floor)
     level.place_stuff
   end
 
@@ -52,7 +52,7 @@ class Map
     direction = id
     @player_floor += id
     if !@grid.key?(@player_floor)
-      @grid[@player_floor] = RandomRoom.new(self, "next", @window)
+      @grid[@player_floor] = RandomRoom.new(self, "next", @window, @player_floor)
       level.place_stuff
       player[:lvl] = @player_floor * -1
 

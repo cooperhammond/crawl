@@ -3,7 +3,8 @@ require 'meiro'
 
 class RandomRoom
   attr_accessor :grid
-  def initialize(map, status, window)
+  def initialize(map, status, window, floor)
+    @floor_level = floor
     @status = status
     @map = map
     @window = window
@@ -81,49 +82,88 @@ class RandomRoom
   end
 
   def place_stuff
-    @map.create_from_grid(-1, -1, @floor, {
-      "#" => ["wall", {color: Gosu::Color::rgb(255, 255, 255)}],
-      ">" => ["player"],
-    })
+    p @floor_level
+    if @floor_level == 0
+      @window.display_pane = false
+      @map.create_from_grid(0, 0, '
+      ___   ___     _    __      __  _
+     / __| | _ \   /_\   \ \    / / | |
+    | (__  |   /  / _ \   \ \/\/ /  | |__
+     \___| |_|_\ /_/ \_\   \_/\_/   |____|
+      The point is to get the HIGH SCORE.
+            Move with ARROW KEYS.
+           Attack with ARROW KEYS.
 
-    (0..7).each do |n|
-      if @map.player_floor * -1 >= 2
-        color = ["orange", "", ""][rand(0..2)]
-      end
-      if @map.player_floor * -1 >= 4
-        color = ["red", "orange", ""][rand(0..2)]
-      end
-      if @map.player_floor * -1 >= 6
-        color = ["red", "orange", "orange"][rand(0..2)]
-      end
-      if @map.player_floor * -1 >= 8
-        color = ["red", "red", "orange"][rand(0..2)]
-      end
-      if @map.player_floor * -1 >= 10
-        color = "red"
-      end
+                  @
 
-      randomly_place_object("alien", id: gen_id, color: color)
-    end
+                         >   <----STAIRS
 
-    randomly_place_object("stairs", id: "descend", num: -1)
-    if @status == "next"
-      randomly_place_object("stairs", id: "ascend", num: 1)
-      randomly_place_object("player")
-      @map.player[:x] = (@map.get_object_by_id("ascend")[:x])
-      @map.player[:y] = (@map.get_object_by_id("ascend")[:y])
-      offset_map_by_name("player")
+   Your first task is to move down the STAIRS
 
+
+
+
+
+
+
+
+          (Hint: It\'s the same key)
+
+       (Hint: It\'s where the . key is)
+'.split("\n"), {
+        "#" => ["wall"],
+        "@" => ["player"],
+        ">" => ["stairs", {num: -1, id: "descend"}],
+      })
     else
-      randomly_place_object("player")
-      while !@map.level.grid.key?("#{@map.player[:x]} #{@map.player[:y]}")
-        @map.delete_object_by_name("player")
-        randomly_place_object("player")
-      end
-      offset_map_by_name("player")
-    end
+      @window.display_pane = true
 
-    @map.set_weapon("weapon")
+      @window.new_text("'h' for help.")
+
+      @map.create_from_grid(-1, -1, @floor, {
+        "#" => ["wall", {color: Gosu::Color::rgb(255, 255, 255)}],
+        ">" => ["player"],
+      })
+
+      (0..7).each do |n|
+        if @map.player_floor * -1 >= 2
+          color = ["orange", "", ""][rand(0..2)]
+        end
+        if @map.player_floor * -1 >= 4
+          color = ["red", "orange", ""][rand(0..2)]
+        end
+        if @map.player_floor * -1 >= 6
+          color = ["red", "orange", "orange"][rand(0..2)]
+        end
+        if @map.player_floor * -1 >= 8
+          color = ["red", "red", "orange"][rand(0..2)]
+        end
+        if @map.player_floor * -1 >= 10
+          color = "red"
+        end
+
+        randomly_place_object("alien", id: gen_id, color: color)
+      end
+
+      randomly_place_object("stairs", id: "descend", num: -1)
+      if @status == "next"
+        randomly_place_object("stairs", id: "ascend", num: 1)
+        randomly_place_object("player")
+        @map.player[:x] = (@map.get_object_by_id("ascend")[:x])
+        @map.player[:y] = (@map.get_object_by_id("ascend")[:y])
+        offset_map_by_name("player")
+
+      else
+        randomly_place_object("player")
+        while !@map.level.grid.key?("#{@map.player[:x]} #{@map.player[:y]}")
+          @map.delete_object_by_name("player")
+          randomly_place_object("player")
+        end
+        offset_map_by_name("player")
+      end
+
+      @map.set_weapon("weapon")
+    end
   end
 
   def update

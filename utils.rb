@@ -17,14 +17,12 @@ def universal_controls(window)
     window.texts = []
   end
   if Gosu::button_down?(Gosu::KbH) and check_timer
-    pane_text("
-'c' to clear sidebar
+    pane_text("'c' to clear sidebar
 'qp' to quit
 'al' to restart
 's' for stats
 'w' to wait one turn
-escape-key to toggle fullscreen
-")
+escape-key to toggle fullscreen")
   end
 
   if Gosu::button_down?(Gosu::KbQ) and Gosu::button_down?(Gosu::KbP) and check_timer

@@ -2,7 +2,7 @@ require 'gosu'
 Dir["./*.rb"].each { |file| require file }
 
 class GameWindow < Gosu::Window
-  attr_accessor :texts
+  attr_accessor :texts, :display_pane
   attr_reader :map, :level, :zoom
   def initialize(map)
 	  @font = Gosu::Font.new(25)
@@ -20,6 +20,7 @@ class GameWindow < Gosu::Window
     @map = map
 
     @box_width = 20
+    @display_pane = true
     super((@map.width * @text_width).round + (@text_width * @box_width).round, (@map.height * @text_height).round + @text_height)
     self.caption = ""
     self.fullscreen = false
@@ -68,7 +69,6 @@ class GameWindow < Gosu::Window
 
 
   def draw
-    Gosu::draw_rect(self.width - (@text_width * @box_width), 0, self.width - (self.width / (@text_width * @box_width)), self.height, Gosu::Color::rgb(0, 0, 0), 2)
 
     @map.level.grid.each do |point, props|
       @font.draw(props[:symbol], (props[:x] * @text_width + @map.player_offset_x * @text_width) * @zoom,
@@ -82,9 +82,12 @@ class GameWindow < Gosu::Window
       (@text_width * 2)) + @text_width * 7) * @zoom, ((@map.height * @text_height).round) * @zoom,
       1, @zoom, @zoom, item[:color])
     end
-    @texts.uniq
-    @texts.each do |text|
-      text.draw
+    if @display_pane == true
+      @texts.uniq
+      Gosu::draw_rect(self.width - (@text_width * @box_width), 0, self.width - (self.width / (@text_width * @box_width)), self.height, Gosu::Color::rgb(0, 0, 0), 2)
+      @texts.each do |text|
+        text.draw
+      end
     end
   end
 
