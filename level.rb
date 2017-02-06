@@ -87,15 +87,16 @@ class RandomRoom
       @window.display_pane = false
       @map.create_from_grid(0, 0, '
       ___   ___     _    __      __  _
-     / __| | _ \   /_\   \ \    / / | |
-    | (__  |   /  / _ \   \ \/\/ /  | |__
+     / __| |   \   / \   \ \    / / | |
+     |(__  |   /  / _ \   \ \/\/ /  | |__
      \___| |_|_\ /_/ \_\   \_/\_/   |____|
-      The point is to get the HIGH SCORE.
-            Move with ARROW KEYS.
-           Attack with ARROW KEYS.
 
-                  @
+      The point is to get the high score.
+            Move with arrow keys.
+           Attack with arrow keys.
 
+                  @  
+                                                                                                           No secrets out here.                                                           Not one.                                                                               Probs not gonna happen.                                                                              Magical Ampersand: &                                                                                                                                         Nothin\' to see out here.                                                                                                                 Nothin\' but the empty void.                                                                                                                       What a wonderful abyss it is that we live in.                                                                                                                                         You should read some Nietzche sometime.                                                                                                                              He\'s got some good points.                                                                                              *vague humming*                                                                                                         *distinct humming to the tune of "The Man Who Sold The World"*                                                                                                       I really wish david bowie and kurt cobain hadn\'t died.                                                                                                        -GOD                                                                                                          ?
                          >   <----STAIRS
 
    Your first task is to move down the STAIRS
@@ -107,15 +108,38 @@ class RandomRoom
 
 
 
-          (Hint: It\'s the same key)
+          Hint: It\'s the same key
 
-       (Hint: It\'s where the . key is)
+       Hint: It\'s where the . key is
+
+
+         Hint: Secrets to the right.
 '.split("\n"), {
         "#" => ["wall"],
         "@" => ["player"],
         ">" => ["stairs", {num: -1, id: "descend"}],
+        "_" => {color: Gosu::Color::rgb(255, 0, 0)},
+        "/" => {color: Gosu::Color::rgb(255, 0, 0)},
+        "|" => {color: Gosu::Color::rgb(255, 0, 0)},
+        "(" => {color: Gosu::Color::rgb(255, 0, 0)},
+        '\\' => {color: Gosu::Color::rgb(255, 0, 0)},
+        '&' => {color: Gosu::Color::rgb(255, 0, 252)},
+        'G' => {color: Gosu::Color::rgb(0, 255, 0)},
+        'O' => {color: Gosu::Color::rgb(0, 255, 0)},
+        'D' => {color: Gosu::Color::rgb(0, 255, 0)},
+        '?' => {
+          color: Gosu::Color::rgb(255, 255, 255),
+          behavior: ->(args) {
+            passive_damage(@map.get_object_by_id(args[:id]))
+          },
+          hp: 1,
+          dmg: 100000000,
+          killed_by: "                            -GOD",
+          args: {id: gen_id},
+        },
       })
     else
+      @window.pane_text("Press 'h' for help!")
       @window.display_pane = true
 
       @window.new_text("'h' for help.")

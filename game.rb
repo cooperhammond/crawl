@@ -34,8 +34,6 @@ class GameWindow < Gosu::Window
 
     @height = self.height.to_s.to_f
 
-    pane_text("Press 'h' for help!")
-
   end
 
   def update
@@ -82,12 +80,12 @@ class GameWindow < Gosu::Window
       (@text_width * 2)) + @text_width * 7) * @zoom, ((@map.height * @text_height).round) * @zoom,
       1, @zoom, @zoom, item[:color])
     end
+    @texts.uniq
+    @texts.each do |text|
+      text.draw
+    end
     if @display_pane == true
-      @texts.uniq
       Gosu::draw_rect(self.width - (@text_width * @box_width), 0, self.width - (self.width / (@text_width * @box_width)), self.height, Gosu::Color::rgb(0, 0, 0), 2)
-      @texts.each do |text|
-        text.draw
-      end
     end
   end
 
