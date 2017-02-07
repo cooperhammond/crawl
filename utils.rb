@@ -18,14 +18,13 @@ def universal_controls(window)
   end
   if Gosu::button_down?(Gosu::KbH) and check_timer
     pane_text("'c' to clear sidebar
-'qp' to quit
-'al' to restart
+'q' to quit
 's' for stats
 'w' to wait one turn
 escape-key to toggle fullscreen")
   end
 
-  if Gosu::button_down?(Gosu::KbQ) and Gosu::button_down?(Gosu::KbP) and check_timer
+  if Gosu::button_down?(Gosu::KbQ) and check_timer
     exit
   end
   if Gosu::button_down?(Gosu::KbS) and check_timer
@@ -39,13 +38,16 @@ escape-key to toggle fullscreen")
   #    pane_text("- #{item[:name]}")
   #  end
   #end
-  if Gosu::button_down?(Gosu::KbF) and Time.new - @timer > 0.5
+  if Gosu::button_down?(Gosu::KbF) and check_timer
     @timer = Time.new
     pane_text("The current fps is #{Gosu::fps.to_s}")
   end
-  if Gosu::button_down?(Gosu::KbA) and Gosu::button_down?(Gosu::KbL) and Time.new - @timer > 0.5
+  if Gosu::button_down?(Gosu::KbA) and Gosu::button_down?(Gosu::KbL) and check_timer
     @timer = Time.new
     initialize(Map.new($x, $y))
+  end
+  if Gosu::button_down?(Gosu::KbA) and check_timer
+    puts @map.player
   end
 end
 
@@ -129,7 +131,9 @@ def object_controls(object)
       if @map.valid_movement?(dir, object)
         if @map.attack_movement?(dir, object)
           dmg = @map.player[:current_weapon][:dmg]
-          @map.attack_object(dir, object, rand(dmg - 10..dmg + 10))
+          dmg = rand((dmg * 0.8)..(dmg * 1.2)).round
+          p dmg
+          @map.attack_object(dir, object, dmg)
           $window.pane_text("You attacked for #{dmg} damage!")
         else
           everything(dir)
@@ -333,4 +337,14 @@ def talk(words, id, opts={})
   elsif $window.get_text_by_id(id)
     $window.texts.delete_at(@window.texts.index(@window.get_text_by_id(id)))
   end
+end
+
+def player_died()
+  @map.player_lives -= 1
+  @map.player[:hp] = @map.player[:max_hp]
+  #@map.level.
+end
+
+def win()
+  @window.winning = true
 end

@@ -1,8 +1,9 @@
 require 'gosu'
 Dir["./*.rb"].each { |file| require file }
+require_relative 'graphics/winning.rb'
 
 class GameWindow < Gosu::Window
-  attr_accessor :texts, :display_pane
+  attr_accessor :texts, :display_pane, :winning
   attr_reader :map, :level, :zoom
   def initialize(map)
 	  @font = Gosu::Font.new(25)
@@ -34,58 +35,71 @@ class GameWindow < Gosu::Window
 
     @height = self.height.to_s.to_f
 
+    @winning = true
+    @winning_graphics = Winning.new(self)
+
   end
 
   def update
     universal_controls(self) # Universal controls.
+    if @winning == false
 
-    # Level updating and turns as well as any pending actions.
-  	begin
-      @map.level.grid.each do |loc, object|
-        if object.key?(:keys)
-          if object.key?(:args)
-            object[:keys].call(object[:args])
-          else
-            object[:keys].call
+      # Level updating and turns as well as any pending actions.
+    	begin
+        @map.level.grid.each do |loc, object|
+          if object.key?(:keys)
+            if object.key?(:args)
+              object[:keys].call(object[:args])
+            else
+              object[:keys].call
+            end
           end
         end
+        @map.update
+
+    		if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
+    		  @timer = Time.new
+    		  @map.turns
+    		end
+    	rescue Exception => e
+        if e.to_s  == "exit"
+          exit
+        end
+    		puts e.backtrace
+        puts e
+    	end
+      if @pending.any?
+        send(@pending[0], @pending[1])
+        @pending = []
       end
-      @map.update
-  		if @map.level.update or Gosu::button_down?(Gosu::KbW) and Time.new - @timer > 0.06
-  		  @timer = Time.new
-  		  @map.turns
-  		end
-  	rescue Exception => e
-  		puts e.backtrace
-      puts e
-  	end
-    if @pending.any?
-      send(@pending[0], @pending[1])
-      @pending = []
     end
   end
 
 
   def draw
+      if @winning == false
+      @map.level.grid.each do |point, props|
+        @font.draw(props[:symbol], (props[:x] * @text_width + @map.player_offset_x * @text_width) * @zoom,
+          (props[:y] * @text_height + @map.player_offset_y * @text_height) * @zoom, 1, @zoom, @zoom, props[:color])
+      end
 
-    @map.level.grid.each do |point, props|
-      @font.draw(props[:symbol], (props[:x] * @text_width + @map.player_offset_x * @text_width) * @zoom,
-        (props[:y] * @text_height + @map.player_offset_y * @text_height) * @zoom, 1, @zoom, @zoom, props[:color])
-    end
+      @font.draw("Items: ", 0, (@map.height * @text_height).round * @zoom, 2, @zoom, @zoom, Gosu::Color::rgb(150, 150, 150))
 
-    @font.draw("Items: ", 0, (@map.height * @text_height).round * @zoom, 2, @zoom, @zoom, Gosu::Color::rgb(150, 150, 150))
-
-    @map.player[:inventory].each do |item|
-      @font.draw(item[:symbol], ((@map.player[:inventory].index(item) *
-      (@text_width * 2)) + @text_width * 7) * @zoom, ((@map.height * @text_height).round) * @zoom,
-      1, @zoom, @zoom, item[:color])
-    end
-    @texts.uniq
-    @texts.each do |text|
-      text.draw
-    end
-    if @display_pane == true
-      Gosu::draw_rect(self.width - (@text_width * @box_width), 0, self.width - (self.width / (@text_width * @box_width)), self.height, Gosu::Color::rgb(0, 0, 0), 2)
+      @map.player[:inventory].each do |item|
+        @font.draw(item[:symbol], ((@map.player[:inventory].index(item) *
+        (@text_width * 2)) + @text_width * 7) * @zoom, ((@map.height * @text_height).round) * @zoom,
+        1, @zoom, @zoom, item[:color])
+      end
+      @texts.uniq
+      @texts.each do |text|
+        text.draw
+      end
+      if @display_pane == true
+        Gosu::draw_rect(self.width - (@text_width * @box_width), 0, self.width - (self.width / (@text_width * @box_width)), self.height, Gosu::Color::rgb(0, 0, 0), 2)
+      end
+    elsif @winning == true
+      @winning_graphics.draw
+      @winning_graphics.update
     end
   end
 

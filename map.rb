@@ -1,6 +1,6 @@
 class Map
   attr_reader :width, :height, :grid, :level, :player_x, :player_y, :player_floor
-  attr_accessor :player_offset_x, :player_offset_y, :player_turns
+  attr_accessor :player_offset_x, :player_offset_y, :player_turns, :player_lives
   def initialize(x, y)
     @width = x
     @height = y
@@ -20,13 +20,14 @@ class Map
       killed_by: "You were killed by god."
     })
 
-    @player_floor = 0
+    @player_floor = -10
 
 
     @player_offset_x = 0
     @player_offset_y = 0
 
     @dead_player = false
+    @player_lives = 3
 
     @player_turns = 0
   end
@@ -38,6 +39,7 @@ class Map
 
   def give_window(window)
     @window = window
+    @map = self
   end
 
   def level
@@ -86,17 +88,21 @@ class Map
       end
     end
 
-    if player[:hp] <= 0 and @dead_player != true
-      @dead_player = true
-      killed_by(player[:killed_by])
+    if player[:hp] <= 0
+      player_died()
     end
+
+    #if @player_lives <= 0 and @dead_player != true
+    #  @dead_player = true
+    #  killed_by(player[:killed_by])
+    #end
 
     level.offset_map_by_name("player")
   end
 
   def turns
+    p "this"
     if level.update
-
       level.grid.each do |loc, object|
         if object.key?(:behavior)
           if object[:args] != {}
@@ -129,6 +135,7 @@ class Map
   end
 
   def damage_player(dmg, words)
+    dmg = rand((dmg * 0.8)..(dmg * 1.2)).round
     player[:hp] -= dmg
     player[:killed_by] = words
     @window.pane_text("You took #{dmg}\ndamage!")
