@@ -92,16 +92,15 @@ class Map
       player_died()
     end
 
-    #if @player_lives <= 0 and @dead_player != true
-    #  @dead_player = true
-    #  killed_by(player[:killed_by])
-    #end
+    if @player_lives <= 0 and @dead_player != true
+      @dead_player = true
+      killed_by(player[:killed_by])
+    end
 
     level.offset_map_by_name("player")
   end
 
   def turns
-    p "this"
     if level.update
       level.grid.each do |loc, object|
         if object.key?(:behavior)

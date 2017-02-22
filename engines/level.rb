@@ -1,6 +1,5 @@
-require_relative 'game.rb'
 require 'meiro'
-require_relative 'levels.rb'
+Dir.glob("../utils/*.rb").each { |file| require_relative file }
 
 class RandomRoom
   attr_accessor :grid

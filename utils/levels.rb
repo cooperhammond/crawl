@@ -22,7 +22,7 @@ class TitleScreen < Standard
     @window.display_pane = false
     @map.create_from_grid(0, 0, '
     ___   ___     _    __      __  _
-   / __| |   \   / \   \ \    / / | |
+   / __| | _ \   /_\   \ \    / / | |
    |(__  |   /  / _ \   \ \/\/ /  | |__
    \___| |_|_\ /_/ \_\   \_/\_/   |____|
 
