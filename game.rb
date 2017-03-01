@@ -1,10 +1,10 @@
 require 'gosu'
 Dir.glob("utils/*.rb").each { |file| require_relative file }
-Dir.glob("media/*.rb").each { |file| require_relative file }
+Dir.glob("assets/*.rb").each { |file| require_relative file }
 Dir.glob("engines/*.rb").each { |file| require_relative file }
 
 class GameWindow < Gosu::Window
-  attr_accessor :texts, :display_pane, :winning
+  attr_accessor :texts, :display_pane, :winning, :score
   attr_reader :map, :level, :zoom
   def initialize(map)
 	  @font = Gosu::Font.new(25)
@@ -13,7 +13,7 @@ class GameWindow < Gosu::Window
     @scale = 25
     @text_height = @scale
     @zoom = 1.6
-    @font = Gosu::Font.new(temp, "./media/courier.ttf", @text_height)
+    @font = Gosu::Font.new(temp, "./assets/courier.ttf", @text_height)
 
     @texts = []
     @text_width = @font.text_width("!")
@@ -38,7 +38,7 @@ class GameWindow < Gosu::Window
 
     @winning = false
     @winning_graphics = Winning.new(self)
-
+    @score = 0
   end
 
   def update
@@ -73,6 +73,8 @@ class GameWindow < Gosu::Window
         send(@pending[0], @pending[1])
         @pending = []
       end
+    else
+      @winning_graphics.winning
     end
   end
 
@@ -105,7 +107,7 @@ class GameWindow < Gosu::Window
   end
 
   def new_text(words, opts={})
-    @texts.push(Text.new(self, words, "./media/courier.ttf", 30, opts))
+    @texts.push(Text.new(self, words, "./assets/courier.ttf", 30, opts))
   end
 
   def pane_text(words, opts={})
@@ -113,7 +115,7 @@ class GameWindow < Gosu::Window
       @texts = []
     end
 
-    temp_text = Text.new(self, words, "./media/courier.ttf", 30, \
+    temp_text = Text.new(self, words, "./assets/courier.ttf", 30, \
       opts.merge({x_loc: (self.width - (@text_width * @box_width)) / self.width, \
       new_line: @text_height, sound: "./text.wav"}))
 
@@ -127,7 +129,7 @@ class GameWindow < Gosu::Window
       end
     end
 
-    @texts.push(Text.new(self, words, "./media/courier.ttf", 30, \
+    @texts.push(Text.new(self, words, "./assets/courier.ttf", 30, \
       opts.merge({x_loc: (self.width - (@text_width * @box_width)) / self.width, \
       y_loc: complete_text_height,\
       new_line: @text_height, sound: "./text.wav"})))

@@ -20,7 +20,7 @@ class Map
       killed_by: "You were killed by god."
     })
 
-    @player_floor = -10
+    @player_floor = 0
 
 
     @player_offset_x = 0
@@ -30,6 +30,7 @@ class Map
     @player_lives = 3
 
     @player_turns = 0
+
   end
 
   def start_running
@@ -51,7 +52,6 @@ class Map
   end
 
   def new_level(id)
-    direction = id
     @player_floor += id
     if !@grid.key?(@player_floor)
       @grid[@player_floor] = RandomRoom.new(self, "next", @window, @player_floor)
@@ -76,7 +76,8 @@ class Map
     level.grid.each do |loc, object|
       if object[:type] == "enemy"
         if object[:hp] <= 0
-          delete_object_by_true_loc(object[:x], object[:y])
+          @window.score += object[:max_hp]
+          delete_object_by_true_loc(object)
         end
       end
 
@@ -152,9 +153,9 @@ class Map
     end
   end
 
-  def delete_object_by_true_loc(x, y)
+  def delete_object_by_true_loc(obj)
     level.grid.each do |loc, object|
-      if "#{x} #{y}" == "#{object[:x]} #{object[:y]}"
+      if obj == object
         level.grid.delete(loc)
       end
     end

@@ -47,7 +47,7 @@ escape-key to toggle fullscreen")
     initialize(Map.new($x, $y))
   end
   if Gosu::button_down?(Gosu::KbA) and check_timer
-    puts @map.player
+    puts "#{@map.player[:x]}, #{@map.player[:y]}"
   end
 end
 
@@ -104,14 +104,16 @@ def level_box(params={width: 20, height: 10, x: 10, y: 10})
   end
 end
 
-def object_controls(object)
-  def everything(xy)
-    @map.level.grid.each do |loc, object|
-      object[:x] -= xy[0] unless object[:symbol] == "@"
-      object[:y] -= xy[1] unless object[:symbol] == "@"
+def everything(xy)
+  @map.level.grid.each do |loc, object|
+    if object[:symbol] != "@"
+      object[:x] -= xy[0]
+      object[:y] -= xy[1]
     end
   end
+end
 
+def object_controls(object)
   if Time.new - @move_timer > 0.06
     @move_timer = Time.new
     dir = nil
@@ -132,10 +134,10 @@ def object_controls(object)
         if @map.attack_movement?(dir, object)
           dmg = @map.player[:current_weapon][:dmg]
           dmg = rand((dmg * 0.8)..(dmg * 1.2)).round
-          p dmg
           @map.attack_object(dir, object, dmg)
           $window.pane_text("You attacked for #{dmg} damage!")
         else
+          @map.level.reset_dir = [dir, @map.level.reset_dir].transpose.map {|x| x.reduce(:+)}
           everything(dir)
         end
       end
@@ -162,7 +164,11 @@ def default_definitions()
       end
     },
     keys: ->(args) {
-      if args[:num] == -1
+      type = nil
+      if args[:num] == "leaderboard"
+        @map.get_object_by_id(args[:id])[:symbol] = "<"
+        args[:num] = 1
+      elsif args[:num] == -1
         key = Gosu::KbPeriod
       else
         key = Gosu::KbComma
@@ -280,8 +286,8 @@ def chase(obj1, obj2)
 end
 
 def killed_by(words)
-  $window.set_pending("pend_killed_by", [$window, words])
   $window.texts = []
+  $window.set_pending("pend_killed_by", [$window, words])
 end
 
 def passive_damage(obj)
@@ -311,10 +317,13 @@ def pend_killed_by(args)
       "Y" => {color: Gosu::Color::rgb(252, 237, 100)},
       "|" => {color: Gosu::Color::rgb(0, 179, 18)},
       "." => {color: Gosu::Color::rgb(88, 47, 37)},
-	  "A" => ["alien"],
+	    "A" => ["alien"],
     }
   )
   args[0].new_text(args[1], {y_loc: 0.1, new_line: 50, sound: "text.wav", id: "death", right_border: $window.width - 300})
+  open('leaderboard', 'a') do |f|
+    f.puts "#{args[0].score}  -  #{Time.now.strftime("%m/%d/%Y %H:%M:%S")}"
+  end
 end
 
 def kill_player_if_touching(id, words)
@@ -342,9 +351,14 @@ end
 def player_died()
   @map.player_lives -= 1
   @map.player[:hp] = @map.player[:max_hp]
-  #@map.level.
+  @map.level.player_died
 end
 
 def win()
   @window.winning = true
+end
+
+def loc_diff(from_here, to_here)
+  from_here.map!{ |x| x * -1}
+  return [from_here, to_here].transpose.map {|x| x.reduce(:+)}
 end

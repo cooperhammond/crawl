@@ -43,7 +43,7 @@ class TitleScreen < Standard
 
 
    Move down the stairs with the . key
-      Move up stairs with the , key
+Move through the leaderboard with the , key
 
 
           Secrets to the right.
@@ -51,6 +51,7 @@ class TitleScreen < Standard
       "#" => ["wall"],
       "@" => ["player"],
       ">" => ["stairs", {num: -1, id: "descend"}],
+      "*" => ["stairs", {num: "leaderboard", id: "leaderboard"}],
       "_" => {color: Gosu::Color::rgb(255, 0, 0)},
       "/" => {color: Gosu::Color::rgb(255, 0, 0)},
       "|" => {color: Gosu::Color::rgb(255, 0, 0)},
@@ -103,7 +104,7 @@ class Endgame < Standard
 
 
 
-               (It\'s the "o" in "Welcome.")
+               (It\'s the "o" in "WELCOME.")
 
 
     '.split("\n"), {
@@ -122,6 +123,7 @@ end
 
 
 class RandomFloor < Standard
+  attr_reader :player_spawn
   def initialize(level)
     @level = level
     @map = level.map
@@ -136,9 +138,11 @@ class RandomFloor < Standard
       killed_by: ["When trying to kiss an alien, it decided to eat you. Sicko.", "You were killed by an alien.", "Alien spit, does, in fact, burn.", "Once upon a time, you died.", "In the name of science, you discovered what an alien's stomach looks like.", "When unarmed, don't attempt battle.", "The key to success is not dying.", "What a surprise, you died.", "You were supposed to stay alive.", "*snide 'you died' comment*", "Here's a grave because we reward failure."][rand(0..10)],
       behavior: ->(args) {
         me = @map.get_object_by_id(args[:id])
-        passive_damage(me)
-        if distance_from(me, @map.player) < 7
+        dist = distance_from(me, @map.player)
+        if dist < 7 and dist >= 2
           chase(me, @map.player)
+        elsif dist <= 2
+          passive_damage(me)
         else
           move_randomly(me)
         end
@@ -155,6 +159,7 @@ class RandomFloor < Standard
           me[:hp] = rand(350..500)
           me[:dmg] = rand(70..90)
         end
+        me[:max_hp] = me[:hp]
       }
     })
 
@@ -237,9 +242,28 @@ class RandomFloor < Standard
       @level.offset_map_by_name("player")
     end
 
+    tmp_player = @map.player.dup
+    @player_spawn = [tmp_player[:x], tmp_player[:y]]
+
     @map.set_weapon("weapon")
   end
   def floor
     return @floor
+  end
+end
+
+class Leaderboard < Standard
+  def place_stuff
+    grid = ["@", "SCORE - DATE", ""]
+    tmp = []
+    File.readlines('leaderboard').each do |line|
+      tmp.push(line.tr("\n", "").split(" - "))
+    end
+    tmp.sort_by!{|x| x[0].to_i}.reverse!
+    grid += tmp.map{|x| x.join(" - ")}
+
+    @map.create_from_grid(0, 0, grid, {
+      "@" => ["player"],
+    })
   end
 end
